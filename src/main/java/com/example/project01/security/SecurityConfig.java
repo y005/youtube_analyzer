@@ -6,11 +6,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 
 @Configuration
 public class SecurityConfig {
@@ -34,15 +36,12 @@ public class SecurityConfig {
         UserService userService = applicationContext.getBean(UserService.class);
         return new JwtAuthenticationProvider(jwt, userService);
     }
-    @Bean
-    public AuthenticationManager authenticationManager() throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder = applicationContext.getBean(AuthenticationManagerBuilder.class);
-        return authenticationManagerBuilder.authenticationProvider(jwtAuthenticationProvider()).build();
-    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                    .antMatchers("/youtube/**").hasAnyRole("USER")
+        http.authenticationProvider(jwtAuthenticationProvider())
+                .authorizeRequests()
+                    .antMatchers("/youtube/subscribe/**", "/youtube/content/**").hasAnyRole("USER")
                     .anyRequest().permitAll()
                 .and()
                 .formLogin()
@@ -57,10 +56,10 @@ public class SecurityConfig {
                     .disable()
                 .logout()
                     .disable()
-                .addFilterAfter(jwtAuthenticationFilter(), SecurityContextHolderFilter.class)
                 .sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authenticationManager(authenticationManager());
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
+                .addFilterAfter(jwtAuthenticationFilter(), SecurityContextPersistenceFilter.class);
         return http.build();
     }
 }

@@ -2,6 +2,7 @@ package com.example.project01.youtube.controller;
 
 import com.example.project01.security.Jwt;
 import com.example.project01.security.JwtAuthentication;
+import com.example.project01.security.JwtAuthenticationProvider;
 import com.example.project01.security.JwtAuthenticationToken;
 import com.example.project01.youtube.agent.YoutubeTokenAgent;
 import com.example.project01.youtube.dto.JwtToken;
@@ -14,7 +15,6 @@ import com.example.project01.youtube.service.UserService;
 import com.example.project01.youtube.service.YoutubeService;
 import com.google.api.services.youtube.model.Subscription;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -29,7 +29,7 @@ public class YoutubeApiController {
     private final YoutubeTokenAgent youtubeTokenAgent;
     private final YoutubeService youtubeService;
     private final UserService userService;
-    private final AuthenticationManager authenticationManager;
+    private final JwtAuthenticationProvider jwtAuthenticationProvider;
     private final Jwt jwt;
 
     @ExceptionHandler({Exception.class})
@@ -53,14 +53,14 @@ public class YoutubeApiController {
         return User.builder()
                 .user_id(userId)
                 .user_password(userPassword)
-                .user_roles("USER")
+                .user_roles("ROLE_USER")
                 .build();
     }
 
     @GetMapping("/login")
     public Object login(@RequestBody LoginForm loginForm) {
         JwtAuthenticationToken jwtAuthenticationToken = new JwtAuthenticationToken(loginForm.getUserId(), loginForm.getUserPassword());
-        JwtAuthenticationToken authenticatedToken = (JwtAuthenticationToken) authenticationManager.authenticate(jwtAuthenticationToken);
+        JwtAuthenticationToken authenticatedToken = (JwtAuthenticationToken) jwtAuthenticationProvider.authenticate(jwtAuthenticationToken);
         JwtAuthentication authentication = (JwtAuthentication) authenticatedToken.getPrincipal();
         return JwtToken.builder()
                 .token(authentication.getToken())
