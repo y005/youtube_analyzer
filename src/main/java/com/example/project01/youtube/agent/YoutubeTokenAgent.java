@@ -17,17 +17,25 @@ import java.nio.charset.StandardCharsets;
 public class YoutubeTokenAgent {
     public static final String AUTHORIZATION_CODE = "authorization_code";
     public static final String REFRESH_TOKEN = "refresh_token";
+    public static final String CLIENT_ID = "client_id";
+    public static final String CLIENT_SECRET = "client_secret";
+    public static final String GRANT_TYPE = "grant_type";
+    public static final String CODE = "code";
+    public static final String REDIRECT_URI = "redirect_uri";
+    public static final String SCOPE = "scope";
+    public static final String ACCESS_TYPE = "access_type";
+    public static final String RESPONSE_TYPE = "response_type";
     private final RestTemplate restTemplate;
     private final YoutubeConfig youtubeConfig;
     public String makeOauthServerUrl() {
         return UriComponentsBuilder
                 .fromUriString(youtubeConfig.getOauthServer())
                 .path("/auth")
-                .queryParam("client_id", youtubeConfig.getClientId())
-                .queryParam("redirect_uri", youtubeConfig.getRedirectUrl())
-                .queryParam("response_type", "code")
-                .queryParam("scope", makeScope())
-                .queryParam("access_type", "offline")
+                .queryParam(CLIENT_ID, youtubeConfig.getClientId())
+                .queryParam(REDIRECT_URI, youtubeConfig.getRedirectUrl())
+                .queryParam(RESPONSE_TYPE, "code")
+                .queryParam(SCOPE, makeScope())
+                .queryParam(ACCESS_TYPE, "offline")
                 .encode(StandardCharsets.UTF_8)
                 .build().toUri().toString();
     }
@@ -57,23 +65,23 @@ public class YoutubeTokenAgent {
 
     private OauthRefreshToken requestRefreshToken(String url, String code) {
         MultiValueMap<String, String> params = makeDefaultParma();
-        params.add("grant_type", AUTHORIZATION_CODE);
-        params.add("redirect_uri", youtubeConfig.getRedirectUrl());
-        params.add("code", code);
+        params.add(GRANT_TYPE, AUTHORIZATION_CODE);
+        params.add(REDIRECT_URI, youtubeConfig.getRedirectUrl());
+        params.add(CODE, code);
         return restTemplate.postForObject(url, params, OauthRefreshToken.class);
     }
 
     private OauthAccessToken requestAccessToken(String url, String refreshToken) {
         MultiValueMap<String, String> params = makeDefaultParma();
-        params.add("grant_type", REFRESH_TOKEN);
-        params.add("refresh_token", refreshToken);
+        params.add(GRANT_TYPE, REFRESH_TOKEN);
+        params.add(REFRESH_TOKEN, refreshToken);
         return restTemplate.postForObject(url, params, OauthAccessToken.class);
     }
 
     private MultiValueMap<String, String> makeDefaultParma() {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("client_id", youtubeConfig.getClientId());
-        params.add("client_secret", youtubeConfig.getClientPwd());
+        params.add(CLIENT_ID, youtubeConfig.getClientId());
+        params.add(CLIENT_SECRET, youtubeConfig.getClientPwd());
         return params;
     }
 }

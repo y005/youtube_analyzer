@@ -16,4 +16,5 @@ public class YoutubeConfig {
     private String clientId;
     private String clientPwd;
     private String redirectUrl;
+    private String apiKey;
 }

@@ -39,7 +39,7 @@ dependencies {
     implementation 'org.apache.httpcomponents:httpcore'
     implementation 'org.apache.httpcomponents:httpclient'
     compileOnly 'com.google.apis:google-api-services-youtube:v3-rev20220719-1.32.1'
-    compileOnly'io.openharmony.tpc.thirdlib:google_http_client_jackson2'
+    implementation 'com.auth0:java-jwt:4.0.0'
 }
 
 tasks.named('test') {

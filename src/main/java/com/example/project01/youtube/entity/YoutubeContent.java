@@ -1,21 +1,22 @@
 package com.example.project01.youtube.entity;
 
-import com.google.api.client.util.DateTime;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
+import java.math.BigInteger;
+import java.util.Date;
 
 @Data
 @Builder
 public class YoutubeContent {
     private String title;
-    private String channelName;
-    private String channelId;
-    private String id;
-    private Long viewCount;
-    private Long likeCount;
-    private Long dislikeCount;
-    private DateTime time;
-    private List<String> comments;
+    private String channel_name;
+    private String channel_id;
+    private String video_id;
+    private BigInteger view_count;
+    private BigInteger like_Count;
+    private BigInteger dislike_count;
+    private Date published_time;
+    private String comments;
+    private String user_id;
 }
