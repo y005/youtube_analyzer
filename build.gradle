@@ -38,7 +38,7 @@ dependencies {
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     implementation 'org.apache.httpcomponents:httpcore'
     implementation 'org.apache.httpcomponents:httpclient'
-    compileOnly 'com.google.apis:google-api-services-youtube:v3-rev20220719-1.32.1'
+    implementation 'com.google.apis:google-api-services-youtube:v3-rev20210915-1.32.1'
     implementation 'com.auth0:java-jwt:4.0.0'
 }
 
