@@ -15,12 +15,12 @@ import com.example.project01.youtube.service.UserService;
 import com.example.project01.youtube.service.YoutubeService;
 import com.google.api.services.youtube.model.Subscription;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,7 +30,6 @@ public class YoutubeApiController {
     private final YoutubeService youtubeService;
     private final UserService userService;
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
-    private final Jwt jwt;
 
     @ExceptionHandler({Exception.class})
     public String handle(Exception e) {
@@ -69,13 +68,13 @@ public class YoutubeApiController {
     }
 
     @GetMapping("/content")
-    public List<YoutubeContent> getYoutubeContent(@RequestHeader String token) throws IOException {
-        return youtubeService.getYoutubeContent(getUserId(token));
+    public List<YoutubeContent> getYoutubeContent(@AuthenticationPrincipal JwtAuthentication jwtAuthentication) throws IOException {
+        return youtubeService.getYoutubeContent(jwtAuthentication.getUserId());
     }
 
     @GetMapping("/subscribe")
-    public List<Subscription> getSubscribeInfo(@RequestHeader String token) throws IOException {
-        return youtubeService.getSubscribeInfo(getUserId(token));
+    public List<Subscription> getSubscribeInfo(@AuthenticationPrincipal JwtAuthentication jwtAuthentication) throws IOException {
+        return youtubeService.getSubscribeInfo(jwtAuthentication.getUserId());
     }
 
     @GetMapping("/oauth")
@@ -90,10 +89,5 @@ public class YoutubeApiController {
         youtubeService.saveToken(oauthRefreshToken.toRefreshToken(userId));
         userService.save(User.builder().user_id(userId).build());
         return oauthRefreshToken;
-    }
-
-    private String getUserId(String token) {
-        Map<String, Object> claims= jwt.verify(token).asMap();
-        return (String) claims.get("userId");
     }
 }

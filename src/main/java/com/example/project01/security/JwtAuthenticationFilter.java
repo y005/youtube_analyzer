@@ -48,16 +48,6 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                 } catch (Exception ignore){
                 }
             }
-            else {//발급된 토큰이 없는 경우 <- 로그인 단계
-                String userId = getUserId(request);
-                String userPassword = getUserPassword(request);
-                if ((userId != null) && (userPassword != null)) {
-                    //미인증 객체 생성
-                    JwtAuthenticationToken authentication = new JwtAuthenticationToken(userId, userPassword);
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-            }
         }
         chain.doFilter(request, response);
     }
