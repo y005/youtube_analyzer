@@ -49,8 +49,8 @@ public class YoutubeDataAgent {
                     try {
                        SearchListResponse response = makeRecentYoutubeContentRequest(channelId).execute();
                        response.getItems().forEach(e->recentVideoIdList.add(e.getId().getVideoId()));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                    } catch (Exception e) {
+                        throw new RuntimeException("채널 영상 정보 탐색에서 에러 발생");
                     }
                 }
         );
@@ -62,8 +62,8 @@ public class YoutubeDataAgent {
                 (videoId)->{
                     try {
                         return makeYoutubeContent(videoId);
-                    } catch (IOException e) {
-                        return null;
+                    } catch (Exception e) {
+                        throw new RuntimeException("유튜브 정보 분석에서 에러 발생");
                     }
                 }
         ).filter(Objects::nonNull)

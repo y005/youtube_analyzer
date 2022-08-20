@@ -36,7 +36,11 @@ public class YoutubeService {
         List<YoutubeContent> youtubeContentList = youtubeDataAgent.getYoutubeContent(access_token.getAccess_token());
         for (YoutubeContent element : youtubeContentList) {
             element.setUser_id(id);
-            youtubeContentRepository.save(element);
+            try {
+                youtubeContentRepository.save(element);
+            } catch (Exception ignored) {
+                throw new RuntimeException("이미 존재하는 유튜브 영상 정보입니다.");
+            }
         }
         return youtubeContentList;
     }

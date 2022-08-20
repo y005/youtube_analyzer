@@ -1,5 +1,6 @@
 package com.example.project01.security;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class JwtAuthenticationFilter extends GenericFilterBean {
     private final Jwt jwt;
     private final String header;
@@ -45,7 +47,8 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
                         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                     }
-                } catch (Exception ignore){
+                } catch (Exception e){
+                    log.warn("jwt:auth:fail invalid token");
                 }
             }
         }
@@ -58,13 +61,5 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
     private List<GrantedAuthority> getAuthorities(Jwt.Claims claims) {
         return Arrays.stream(claims.roles).map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-    }
-
-    private String getUserId(HttpServletRequest request) {
-        return request.getHeader("id");
-    }
-
-    private String getUserPassword(HttpServletRequest request) {
-        return request.getHeader("password");
     }
 }
