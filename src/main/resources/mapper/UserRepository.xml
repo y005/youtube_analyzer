@@ -21,4 +21,11 @@
         where user_id = #{user_id}
         and user_password = #{user_password};
     </select>
+
+    <select id="getEveryUser" resultType="com.example.project01.youtube.entity.User">
+        select *
+        from user
+        offset #{offset}
+        limit #{limit}
+    </select>
 </mapper>

@@ -1,6 +1,5 @@
 package com.example.project01.youtube.controller;
 
-import com.example.project01.security.Jwt;
 import com.example.project01.security.JwtAuthentication;
 import com.example.project01.security.JwtAuthenticationProvider;
 import com.example.project01.security.JwtAuthenticationToken;
@@ -15,6 +14,7 @@ import com.example.project01.youtube.service.UserService;
 import com.example.project01.youtube.service.YoutubeService;
 import com.google.api.services.youtube.model.Subscription;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +30,7 @@ public class YoutubeApiController {
     private final YoutubeService youtubeService;
     private final UserService userService;
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
+    private final int MAX_USER = 300;
 
     @ExceptionHandler({Exception.class})
     public String handle(Exception e) {
@@ -89,5 +90,23 @@ public class YoutubeApiController {
         youtubeService.saveToken(oauthRefreshToken.toRefreshToken(userId));
         userService.save(User.builder().user_id(userId).build());
         return oauthRefreshToken;
+    }
+
+    @Scheduled(cron = "0 0 17 * * *")
+    public void crawlingYoutubeContent() {
+        int offset = 0;
+        List<User> users;
+        do {
+            users = userService.getEveryUser(offset, MAX_USER);
+            users.forEach(
+                    (user) -> {
+                        try {
+                            youtubeService.getYoutubeContent(user.getUser_id());
+                        } catch (Exception ignored) {
+                        }
+                    }
+            );
+            offset += users.size();
+        } while (users.size() == MAX_USER);
     }
 }

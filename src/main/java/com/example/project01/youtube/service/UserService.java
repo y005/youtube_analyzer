@@ -6,9 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class UserService {
     private final UserRepository userRepository;
 
@@ -24,5 +26,9 @@ public class UserService {
 
     public User login(String userId, String userPassword) {
         return userRepository.findByUserIdWithPassword(userId, userPassword);
+    }
+
+    public List<User> getEveryUser(int offset, int limit) {
+        return userRepository.getEveryUser(offset, limit);
     }
 }
