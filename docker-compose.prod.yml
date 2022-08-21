@@ -1,0 +1,40 @@
+version: "3.7"
+services:
+  web1:
+    image: openjdk:11
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: >
+      bash -c "nohup java -jar ./builds/libs/project01-0.0.1-SNAPSHOT.jar > /dev/null 2> /dev/null < /dev/null &"
+    restart: on-failure
+    container_name: spring
+    depends_on:
+      - db
+#      - flask
+      
+  # web2:
+  #   image: flask
+  #   ports:
+  #     - "5000:5000"
+  #   container_name: flask
+
+  db:
+    platform: linux/x86_64
+    image: mysql:5.7
+    restart: always
+    container_name: mysql
+    ports:
+      - "3305:3306"
+    environment:
+      - MYSQL_DATABASE=project01
+      - MYSQL_ROOT_PASSWORD=samho101
+      - TZ=Asia/Seoul
+    command:
+      - --lower_case_table_names=1
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - /Users/miridih/miridih/project01/mysql:/var/lib/mysql
