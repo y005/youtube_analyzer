@@ -18,5 +18,7 @@ public class YoutubeContent {
     private BigInteger dislike_count;
     private Date published_time;
     private String comments;
+    private Double percent;
+    private String keywords;
     private String user_id;
 }

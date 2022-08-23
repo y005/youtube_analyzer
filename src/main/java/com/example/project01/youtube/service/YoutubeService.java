@@ -1,7 +1,9 @@
 package com.example.project01.youtube.service;
 
+import com.example.project01.youtube.agent.YoutubeCommentAnalyzerAgent;
 import com.example.project01.youtube.agent.YoutubeDataAgent;
 import com.example.project01.youtube.agent.YoutubeTokenAgent;
+import com.example.project01.youtube.dto.CommentSentimentAnalysisResponse;
 import com.example.project01.youtube.dto.OauthAccessToken;
 import com.example.project01.youtube.entity.RefreshToken;
 import com.example.project01.youtube.entity.YoutubeContent;
@@ -26,6 +28,8 @@ public class YoutubeService {
 
     private final YoutubeDataAgent youtubeDataAgent;
 
+    private final YoutubeCommentAnalyzerAgent youtubeCommentAnalyzerAgent;
+
     @Transactional
     public void saveToken(RefreshToken refreshToken) {
         youtubeTokenRepository.save(refreshToken);
@@ -35,11 +39,18 @@ public class YoutubeService {
         OauthAccessToken access_token = getAccessToken(id);
         List<YoutubeContent> youtubeContentList = youtubeDataAgent.getYoutubeContent(access_token.getAccess_token());
         for (YoutubeContent element : youtubeContentList) {
-            element.setUser_id(id);
             try {
+                element.setUser_id(id);
+                if (element.getComments() != null) {
+                    CommentSentimentAnalysisResponse commentSentimentAnalysisResponse = youtubeCommentAnalyzerAgent.getCommentAnalysis(element.getComments());
+                    if (commentSentimentAnalysisResponse.valid()){
+                        element.setPercent((double) commentSentimentAnalysisResponse.getPercent());
+                        element.setKeywords(commentSentimentAnalysisResponse.getKeywords());
+                    }
+                }
                 youtubeContentRepository.save(element);
-            } catch (Exception ignored) {
-                throw new RuntimeException("이미 존재하는 유튜브 영상 정보입니다.");
+            } catch (Exception e) {
+                throw e;
             }
         }
         return youtubeContentList;

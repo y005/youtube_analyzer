@@ -5,7 +5,7 @@
 
 <mapper namespace="com.example.project01.youtube.repository.YoutubeContentRepository">
     <insert id="save" parameterType="com.example.project01.youtube.entity.YoutubeContent" >
-        insert into youtube_content(title, channel_name, channel_id, video_id, view_count, like_count, dislike_count, published_time, comments, user_id)
-        values(#{param.title}, #{param.channel_name} , #{param.channel_id}, #{param.video_id}, #{param.view_count}, #{param.like_Count}, #{param.dislike_count}, #{param.published_time,jdbcType=TIMESTAMP}, #{param.comments}, #{param.user_id});
+        insert into youtube_content(title, channel_name, channel_id, video_id, view_count, like_count, dislike_count, published_time, comments, user_id, percent, keywords)
+        values (#{param.title}, #{param.channel_name} , #{param.channel_id}, #{param.video_id}, #{param.view_count}, #{param.like_Count}, #{param.dislike_count}, #{param.published_time,jdbcType=TIMESTAMP}, #{param.comments}, #{param.user_id}, #{param.percent}, #{param.keywords});
     </insert>
 </mapper>

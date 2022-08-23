@@ -13,13 +13,21 @@ services:
     container_name: spring
     depends_on:
       - db
-#      - flask
-      
-  # web2:
-  #   image: flask
-  #   ports:
-  #     - "5000:5000"
-  #   container_name: flask
+      - web2
+
+  web2:
+    build:
+      context: .
+      dockerfile: ./flask/Dockerfile
+    ports:
+      - "6000:5000"
+    container_name: web2
+    volumes:
+      - ./flask:/app
+    working_dir: /app
+    command: >
+      bash -c "pip install pandas numpy flask tensorflow nltk konlpy && python server.py"
+    restart: on-failure
 
   db:
     platform: linux/x86_64

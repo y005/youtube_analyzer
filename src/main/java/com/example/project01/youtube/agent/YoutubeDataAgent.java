@@ -23,9 +23,9 @@ public class YoutubeDataAgent {
     public static final String DATE = "date";
     public static final String VIDEO = "video";
     public static final long MAX_CHANNEL_COUNT = 50L;
-    public static final long MAX_VIDEO_COUNT = 1L;
+    public static final long MAX_VIDEO_COUNT = 5L;
     public static final String UNREAD = "unread";
-    public final long MAX_COMMENT_COUNT = 1L;
+    public final long MAX_COMMENT_COUNT = 10L;
     private final YouTube youtube;
     private final YoutubeConfig youtubeConfig;
 
