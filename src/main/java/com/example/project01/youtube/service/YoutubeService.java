@@ -13,6 +13,7 @@ import com.google.api.services.youtube.model.Subscription;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -68,5 +69,19 @@ public class YoutubeService {
     private OauthAccessToken getAccessToken(String id) {
         RefreshToken refreshToken = getRefreshToken(id);
         return youtubeTokenAgent.getAccessToken(refreshToken.getRefresh_token());
+    }
+
+
+    @Transactional
+    public void test() {
+        List<YoutubeContent> youtubeContentList = youtubeContentRepository.getAll();
+        youtubeContentList.forEach((content)->{
+            if (content.getPercent() == null) {
+                CommentSentimentAnalysisResponse commentSentimentAnalysisResponse = youtubeCommentAnalyzerAgent.getCommentAnalysis(content.getComments());
+                content.setKeywords(commentSentimentAnalysisResponse.getKeywords());
+                content.setPercent((double) commentSentimentAnalysisResponse.getPercent());
+                youtubeContentRepository.update(content);
+            }
+        });
     }
 }

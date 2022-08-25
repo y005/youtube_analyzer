@@ -25,7 +25,7 @@ public class YoutubeDataAgent {
     public static final long MAX_CHANNEL_COUNT = 50L;
     public static final long MAX_VIDEO_COUNT = 5L;
     public static final String UNREAD = "unread";
-    public final long MAX_COMMENT_COUNT = 10L;
+    public final long MAX_COMMENT_COUNT = 100L;
     private final YouTube youtube;
     private final YoutubeConfig youtubeConfig;
 

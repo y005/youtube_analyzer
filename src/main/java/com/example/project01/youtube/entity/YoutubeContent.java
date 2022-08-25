@@ -1,13 +1,17 @@
 package com.example.project01.youtube.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
 import java.util.Date;
 
-@Data
 @Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class YoutubeContent {
     private String title;
     private String channel_name;
