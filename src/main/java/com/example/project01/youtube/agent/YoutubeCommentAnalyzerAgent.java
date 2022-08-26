@@ -1,5 +1,6 @@
 package com.example.project01.youtube.agent;
 
+import com.example.project01.youtube.YoutubeConfig;
 import com.example.project01.youtube.dto.CommentSentimentAnalysisRequest;
 import com.example.project01.youtube.dto.CommentSentimentAnalysisResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 @Component
 @RequiredArgsConstructor
 public class YoutubeCommentAnalyzerAgent {
-    public static final String FLASK_SERVER_URL = "http://localhost:6000/analysis";
+    private final YoutubeConfig youtubeConfig;
     private final RestTemplate restTemplate;
 
     public CommentSentimentAnalysisResponse getCommentAnalysis(String comments) {
@@ -24,7 +25,7 @@ public class YoutubeCommentAnalyzerAgent {
 
     private URI makeURI() {
         return UriComponentsBuilder
-                .fromUriString(FLASK_SERVER_URL)
+                .fromUriString(youtubeConfig.getSentimentApiServer())
                 .encode(StandardCharsets.UTF_8)
                 .build().toUri();
     }

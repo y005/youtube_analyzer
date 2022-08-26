@@ -17,4 +17,5 @@ public class YoutubeConfig {
     private String clientPwd;
     private String redirectUrl;
     private String apiKey;
+    private String sentimentApiServer;
 }
