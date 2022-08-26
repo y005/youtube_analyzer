@@ -38,3 +38,4 @@ out/
 
 /mysql/
 docker-compose.local.yml
+/src/main/resources/application-local.yaml
