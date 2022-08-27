@@ -5,12 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Builder
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ResponseV1 {
+public class ResponseV1 implements Serializable {
     Integer status;
     String error_message;
     Object data;

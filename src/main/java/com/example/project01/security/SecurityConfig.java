@@ -37,7 +37,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authenticationProvider(jwtAuthenticationProvider())
                 .authorizeRequests()
-                    .antMatchers("/youtube/subscribe/**", "/youtube/content/**").hasAnyRole("USER")
+                    .antMatchers("/youtube/crawling/**").hasAnyRole("ADMIN")
+                    .antMatchers("/youtube/subscribe/**", "/youtube/content/**", "/youtube/test/**").hasAnyRole("USER")
                     .anyRequest().permitAll()
                 .and()
                 .formLogin()

@@ -5,6 +5,7 @@ import com.example.project01.youtube.agent.YoutubeDataAgent;
 import com.example.project01.youtube.agent.YoutubeTokenAgent;
 import com.example.project01.youtube.dto.CommentSentimentAnalysisResponse;
 import com.example.project01.youtube.dto.OauthAccessToken;
+import com.example.project01.youtube.dto.PagingCondition;
 import com.example.project01.youtube.entity.RefreshToken;
 import com.example.project01.youtube.entity.YoutubeContent;
 import com.example.project01.youtube.repository.YoutubeContentRepository;
@@ -34,6 +35,11 @@ public class YoutubeService {
     @Transactional
     public void saveToken(RefreshToken refreshToken) {
         youtubeTokenRepository.save(refreshToken);
+    }
+
+    @Transactional(readOnly = true)
+    public List<YoutubeContent> findYoutubeContent(String id, PagingCondition pagingCondition) {
+        return youtubeContentRepository.findByUserId(id, pagingCondition.getOffset(), pagingCondition.getSize());
     }
 
     public List<YoutubeContent> getYoutubeContent(String id) throws IOException {
@@ -73,7 +79,7 @@ public class YoutubeService {
 
 
     @Transactional
-    public void test() {
+    public void sentiment() {
         List<YoutubeContent> youtubeContentList = youtubeContentRepository.getAll();
         youtubeContentList.forEach((content)->{
             if (content.getPercent() == null) {

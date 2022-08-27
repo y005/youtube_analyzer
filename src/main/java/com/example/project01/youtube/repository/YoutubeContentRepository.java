@@ -11,4 +11,5 @@ public interface YoutubeContentRepository {
     void save(@Param("param") YoutubeContent youtubeContent);
     void update(@Param("param") YoutubeContent youtubeContent);
     List<YoutubeContent> getAll();
+    List<YoutubeContent> findByUserId(@Param("userId") String userId, @Param("offset") int offset, @Param("limit") int limit);
 }

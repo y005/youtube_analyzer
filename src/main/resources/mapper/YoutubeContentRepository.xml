@@ -16,4 +16,13 @@
     <select id="getAll" resultType="com.example.project01.youtube.entity.YoutubeContent" >
         select * from youtube_content;
     </select>
+
+    <select id="findByUserId" resultType="com.example.project01.youtube.entity.YoutubeContent" >
+        select *
+        from youtube_content
+        where user_id = #{userId}
+        order by published_time desc
+        limit #{limit}
+        offset #{offset};
+    </select>
 </mapper>

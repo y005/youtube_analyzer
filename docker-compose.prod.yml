@@ -1,6 +1,6 @@
 version: "3.7"
 services:
-  web1:
+  spring:
     image: openjdk:11
     ports:
       - "8080:8080"
@@ -9,19 +9,20 @@ services:
     working_dir: /app
     command: >
       bash -c "nohup java -jar build/libs/project01-0.0.1-SNAPSHOT.jar"
-    restart: always
+    restart: on-failure
     container_name: spring
     depends_on:
-      - db
-      - web2
+      - redis
+      - mysql
+      - flask
 
-  web2:
+  flask:
     build:
       context: .
       dockerfile: ./flask/Dockerfile
     ports:
       - "6000:5000"
-    container_name: web2
+    container_name: flask
     volumes:
       - ./flask:/app
     working_dir: /app
@@ -29,10 +30,10 @@ services:
       bash -c "pip install pandas numpy flask tensorflow nltk konlpy && python server.py"
     restart: on-failure
 
-  db:
+  mysql:
     platform: linux/x86_64
-    image: mysql:5.7
-    restart: always
+    image: mysql:8
+    restart: on-failure
     container_name: mysql
     ports:
       - "3306:3306"
@@ -46,3 +47,12 @@ services:
       - --collation-server=utf8mb4_unicode_ci
     volumes:
       - /home/ubuntu/project01/mysql:/var/lib/mysql
+
+  redis:
+    image: redis
+    restart: on-failure
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - /home/ubuntu/project01/redis:/var/lib/mysql

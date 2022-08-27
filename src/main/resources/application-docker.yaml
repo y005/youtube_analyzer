@@ -1,5 +1,9 @@
 spring:
   datasource:
-    url: jdbc:mysql://db:3306/project01
+    url: jdbc:mysql://mysql:3306/project01
+  redis:
+    host: redis
+    port: 6379
+
 youtube:
-  sentiment_api_server: "http://web2:5000/analysis"
+  sentiment_api_server: "http://flask:5000/analysis"

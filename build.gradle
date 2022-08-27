@@ -40,6 +40,9 @@ dependencies {
     implementation 'org.apache.httpcomponents:httpclient'
     implementation 'com.google.apis:google-api-services-youtube:v3-rev20210915-1.32.1'
     implementation 'com.auth0:java-jwt:4.0.0'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'io.springfox:springfox-swagger2:3.0.0'
+    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
 }
 
 tasks.named('test') {
