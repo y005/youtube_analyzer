@@ -18,22 +18,16 @@
 [//]: # (  3. 유사한 키워드 영상 검색 제공)
 
 ### 사용 기술
-- 유튜브 정보 분석 API 서버 사이드 환경
-  - Spring Boot
-  - MyBatis
-  - MySQL 5.7
-  - Spring Security
-  - Youtube Data Client Library
-  
-    [//]: # (  - Redis)
-- 댓글 분석 API 서버 사이드 환경
-  - Flask
-  - Nltk, Konlpy
-  - Tensorflow
-- CI/CD
-  - Github Actions
-  - Docker
-- Cloud
-  - AWS EC2
+
+#### 유튜브 정보 분석 API 서버 사이드 환경
+<img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=flat-square&logo=Spring boot&logoColor=white"/> <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=flat-square&logo=springsecurity&logoColor=white"/>
+<img src="https://img.shields.io/badge/MyBatis-C4242B?style=flat-square&logo=mybatis&logoColor=white"/> <img src="https://img.shields.io/badge/MySQL-2AB1AC?style=flat-square&logo=MySQL&logoColor=white"/> <img src="https://img.shields.io/badge/Youtube Data V3-2AB1AC?style=flat-square&logoColor=white"/> 
+
+#### 댓글 분석 API 서버 사이드 환경
+<img src="https://img.shields.io/badge/Flask-000000?style=flat-square&logo=flask&logoColor=white"/> <img src="https://img.shields.io/badge/Konlpy-A9225C?style=flat-square&logo=konlpy&logoColor=white"/> <img src="https://img.shields.io/badge/Nltk-FF9E0F?style=flat-square&logo=nltk&logoColor=white"/> <img src="https://img.shields.io/badge/Tensorflow-FF6F00?style=flat-square&logo=tensorflow&logoColor=white"/>
+
+#### CI/CD
+<img src="https://img.shields.io/badge/Github Actions-2088FF?style=flat-square&logo=githubactions&logoColor=white"/> <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white"/> <img src="https://img.shields.io/badge/AWS EC2-FF9900?style=flat-square&logo=amazonec2&logoColor=black"/> 
+
 
 [//]: # (  - AWS OpenSearch)
