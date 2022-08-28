@@ -4,11 +4,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PagingResponse<T> {
+public class PagingResponse<T> implements Serializable {
     private int offset;
     private int maxSize;
     private int size;

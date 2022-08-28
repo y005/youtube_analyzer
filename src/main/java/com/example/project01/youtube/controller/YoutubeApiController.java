@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -95,14 +96,17 @@ public class YoutubeApiController {
     }
 
     @GetMapping("/content")
-//    @Cacheable(key = "#id", cacheNames = "content")
+    @Cacheable(value = "youtube", key = "{#jwtAuthentication.userId, #pagingCondition}")
     public ResponseV1 findYoutubeContent(@AuthenticationPrincipal JwtAuthentication jwtAuthentication, PagingCondition pagingCondition) {
         log.info("youtube:content:{}", jwtAuthentication.getUserId());
-        List<YoutubeContent> youtubeContents;
-        PagingResponse<YoutubeContent> result = new PagingResponse<>();
+        List<YoutubeContentResponse> youtubeContents;
+        PagingResponse<YoutubeContentResponse> result = new PagingResponse<>();
         try {
             pagingCondition.init();
-            youtubeContents = youtubeService.findYoutubeContent(jwtAuthentication.getUserId(), pagingCondition);
+            youtubeContents = youtubeService.findYoutubeContent(jwtAuthentication.getUserId(), pagingCondition)
+                    .stream()
+                    .map(YoutubeContentResponse::from)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             log.warn("youtube:content:{} {}", jwtAuthentication.getUserId(), e.getMessage());
             return ResponseV1.error(HttpStatus.FORBIDDEN, "허용되지 않은 접근");

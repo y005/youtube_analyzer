@@ -18,7 +18,17 @@
     </select>
 
     <select id="findByUserId" resultType="com.example.project01.youtube.entity.YoutubeContent" >
-        select *
+        select title as title,
+        channel_name as channel_name,
+        channel_id as channel_id,
+        video_id as video_id,
+        view_count as view_count,
+        like_count as like_count,
+        dislike_count as dislike_count,
+        published_time as published_time,
+        percent as percent,
+        keywords as keywords,
+        user_id as user_id
         from youtube_content
         where user_id = #{userId}
         order by published_time desc

@@ -4,6 +4,9 @@ spring:
   datasource:
     username: root
     password: samho101
+  cache:
+    redis:
+      time-to-live: 300000
   sql:
     init:
       mode: always
