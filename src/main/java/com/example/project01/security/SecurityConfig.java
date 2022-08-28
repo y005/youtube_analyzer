@@ -12,8 +12,27 @@ import org.springframework.security.web.context.SecurityContextPersistenceFilter
 
 @Configuration
 public class SecurityConfig {
+    private static final String[] AUTH_WHITELIST = {
+            "/swagger-ui.html",
+            "/webjars/**",
+            "/swagger-resources/**",
+            "/v2/**",
+            "/youtube/login/**",
+            "/youtube/redirect/**",
+            "/youtube/oauth/**",
+            "/youtube/signup/**"
+    };
+    private static final String[] AUTH_ADMIN_LIST = {
+            "/youtube/crawling/**"
+    };
+    private static final String[] AUTH_USER_LIST = {
+            "/youtube/subscribe/**",
+            "/youtube/content/**",
+            "/youtube/test/**"
+    };
     @Autowired
     private ApplicationContext applicationContext;
+
     @Bean
     public Jwt jwt(JwtConfig jwtConfig) {
         return new Jwt(jwtConfig.getISSUER(), jwtConfig.getCLIENT_SECRET(), jwtConfig.getEXPIRY_SECONDS());
@@ -37,9 +56,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authenticationProvider(jwtAuthenticationProvider())
                 .authorizeRequests()
-                    .antMatchers("/youtube/crawling/**").hasAnyRole("ADMIN")
-                    .antMatchers("/youtube/subscribe/**", "/youtube/content/**", "/youtube/test/**").hasAnyRole("USER")
-                    .anyRequest().permitAll()
+                    .antMatchers(AUTH_WHITELIST).permitAll()
+                    .antMatchers(AUTH_ADMIN_LIST).hasAnyRole("ADMIN")
+                    .antMatchers(AUTH_USER_LIST).hasAnyRole("USER")
+                    .anyRequest().denyAll()
                 .and()
                 .formLogin()
                     .disable()

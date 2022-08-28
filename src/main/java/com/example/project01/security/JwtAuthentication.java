@@ -1,5 +1,6 @@
 package com.example.project01.security;
 
+import io.swagger.annotations.ApiParam;
 import lombok.Getter;
 
 //인증된 유저 엔티티(JwtAuthenticationToken의 Principal)
@@ -7,6 +8,7 @@ import lombok.Getter;
 public class JwtAuthentication {
     public final String token;
 
+    @ApiParam(hidden = true)
     public final String userId;
 
     JwtAuthentication(String token, String userId) {

@@ -11,6 +11,9 @@ import com.example.project01.youtube.service.UserService;
 import com.example.project01.youtube.service.YoutubeService;
 import com.google.api.services.youtube.model.Subscription;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -18,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -36,11 +40,13 @@ public class YoutubeApiController {
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
 
     @ExceptionHandler({Exception.class})
+    @ApiIgnore
     public ResponseV1 handle(Exception e) {
         return ResponseV1.error(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
     @PostMapping("/signup")
+    @ApiOperation(value="계정 생성", notes="계정을 생성한다.")
     public ResponseV1 signup(@RequestBody SignUpForm signUpForm) {
         User user = userService.findByUsername(signUpForm.getUserId());
         if (user == null) {
@@ -63,11 +69,13 @@ public class YoutubeApiController {
     }
 
     @GetMapping("/oauth")
+    @ApiIgnore
     public void oauth(HttpServletResponse response) throws IOException {
         response.sendRedirect(youtubeTokenAgent.makeOauthServerUrl());
     }
 
     @GetMapping("/redirect")
+    @ApiIgnore
     public ResponseV1 redirect(@RequestParam("code") String code) {
         String userId = "sm";
         OauthRefreshToken oauthRefreshToken;
@@ -82,7 +90,8 @@ public class YoutubeApiController {
         return ResponseV1.ok(oauthRefreshToken);
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
+    @ApiOperation(value="로그인", notes="로그인이 성공하면 jwt 토큰을 반환한다.")
     public ResponseV1 login(@RequestBody LoginForm loginForm) {
         JwtAuthenticationToken jwtAuthenticationToken = new JwtAuthenticationToken(loginForm.getUserId(), loginForm.getUserPassword());
         JwtAuthenticationToken authenticatedToken = (JwtAuthenticationToken) jwtAuthenticationProvider.authenticate(jwtAuthenticationToken);
@@ -96,6 +105,10 @@ public class YoutubeApiController {
     }
 
     @GetMapping("/content")
+    @ApiOperation(value="구독 영상 정보 조회", notes="유저가 구독한 영상 정보를 반환한다. (jwt 토큰 필요)")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", required = true, paramType = "header", dataTypeClass = String.class),
+    })
     @Cacheable(value = "youtube", key = "{#jwtAuthentication.userId, #pagingCondition}")
     public ResponseV1 findYoutubeContent(@AuthenticationPrincipal JwtAuthentication jwtAuthentication, PagingCondition pagingCondition) {
         log.info("youtube:content:{}", jwtAuthentication.getUserId());
@@ -115,6 +128,10 @@ public class YoutubeApiController {
     }
 
     @GetMapping("/crawling")
+    @ApiOperation(value="구독 채널 영상 정보 크롤링", notes="가입한 모든 유저에 대해 새로 올라온 구독 채널 영상 정보를 수집한다. (관리자 계정만 사용 가능)")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "token", required = true, paramType = "header", dataTypeClass = String.class),
+    })
     public ResponseV1 crawlingAllYoutubeContent() {
         crawlingYoutubeContent();
         return ResponseV1.ok("crawling finished");
@@ -143,6 +160,7 @@ public class YoutubeApiController {
     }
 
     @GetMapping("/test/content")
+    @ApiIgnore
     public ResponseV1 getYoutubeContent(@AuthenticationPrincipal JwtAuthentication jwtAuthentication) {
         log.info("youtube:content:{}", jwtAuthentication.getUserId());
         List<YoutubeContent> youtubeContents;
@@ -156,6 +174,7 @@ public class YoutubeApiController {
     }
 
     @GetMapping("/test/subscribe")
+    @ApiIgnore
     public ResponseV1 getSubscribeInfo(@AuthenticationPrincipal JwtAuthentication jwtAuthentication) {
         log.info("youtube:content:{}", jwtAuthentication.getUserId());
         List<Subscription> subscriptions;
@@ -169,6 +188,7 @@ public class YoutubeApiController {
     }
 
     @GetMapping("/test/sentiment")
+    @ApiIgnore
     public void sentiment() {
         youtubeService.sentiment();
     }

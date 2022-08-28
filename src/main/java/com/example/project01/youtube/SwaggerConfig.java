@@ -20,8 +20,7 @@ public class SwaggerConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .groupName("youtube")
                 .select()
-                .apis(RequestHandlerSelectors.
-                        basePackage("com.example.project01"))
+                .apis(RequestHandlerSelectors.basePackage("com.example.project01.youtube"))
                 .paths(PathSelectors.ant("/youtube/**"))
                 .build()
                 .apiInfo(apiInfo());
