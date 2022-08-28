@@ -32,4 +32,8 @@
 
 [//]: # (  - AWS OpenSearch)
 
+### 시스템 아키텍처
+![](https://velog.velcdn.com/images/y005/post/30301825-5e5e-4a71-a64c-1b3eefc0a509/image.png)
+
+
 ### [API 사용문서](http://youtubeanalyzer.tk/swagger-ui.html#/)
