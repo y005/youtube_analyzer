@@ -15,6 +15,7 @@ public class YoutubeContentResponse implements Serializable {
     private String channel_name;
     private String channel_id;
     private String video_id;
+    private BigInteger subscribe_count;
     private BigInteger view_count;
     private BigInteger like_Count;
     private BigInteger dislike_count;
@@ -28,6 +29,7 @@ public class YoutubeContentResponse implements Serializable {
                 .title(youtubeContent.getTitle())
                 .channel_name(youtubeContent.getChannel_name())
                 .channel_id(youtubeContent.getChannel_id())
+                .subscribe_count(youtubeContent.getSubscribe_count())
                 .video_id(youtubeContent.getVideo_id())
                 .view_count(youtubeContent.getView_count())
                 .like_Count(youtubeContent.getLike_Count())

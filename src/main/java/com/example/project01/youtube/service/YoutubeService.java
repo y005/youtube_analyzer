@@ -42,6 +42,10 @@ public class YoutubeService {
         return youtubeContentRepository.findByUserId(id, pagingCondition.getOffset(), pagingCondition.getSize());
     }
 
+    public String getUserYoutubeId(String access_token) throws IOException {
+        return youtubeDataAgent.getUserId(access_token);
+    }
+
     public List<YoutubeContent> getYoutubeContent(String id) throws IOException {
         OauthAccessToken access_token = getAccessToken(id);
         List<YoutubeContent> youtubeContentList = youtubeDataAgent.getYoutubeContent(access_token.getAccess_token());

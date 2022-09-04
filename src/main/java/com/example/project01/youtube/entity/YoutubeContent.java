@@ -17,6 +17,7 @@ public class YoutubeContent {
     private String channel_name;
     private String channel_id;
     private String video_id;
+    private BigInteger subscribe_count;
     private BigInteger view_count;
     private BigInteger like_Count;
     private BigInteger dislike_count;

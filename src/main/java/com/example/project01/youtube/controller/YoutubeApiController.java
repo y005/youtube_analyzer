@@ -77,17 +77,18 @@ public class YoutubeApiController {
     @GetMapping("/redirect")
     @ApiIgnore
     public ResponseV1 redirect(@RequestParam("code") String code) {
-        String userId = "sm";
         OauthRefreshToken oauthRefreshToken;
+        String userId;
         try {
             oauthRefreshToken = youtubeTokenAgent.getRefreshToken(code);
+            userId = youtubeService.getUserYoutubeId(oauthRefreshToken.getAccess_token());
             youtubeService.saveToken(oauthRefreshToken.toRefreshToken(userId));
-            userService.save(User.builder().user_id(userId).build());
+            userService.save(User.builder().user_id(userId).user_roles("ROLE_USER").build());
         } catch (Exception e) {
             log.warn("redirect:fail {}", e.getMessage());
             return ResponseV1.error(HttpStatus.BAD_REQUEST, "에러 발생");
         }
-        return ResponseV1.ok(oauthRefreshToken);
+        return ResponseV1.ok(oauthRefreshToken.toRefreshToken(userId));
     }
 
     @PostMapping("/login")
