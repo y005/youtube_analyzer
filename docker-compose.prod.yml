@@ -58,7 +58,7 @@ services:
       - /home/ubuntu/project01/redis:/var/lib/redis
 
   spider_db:
-    platform: ubuntu:latest
+    platform: ubuntu
     image: mariadb:10.1
     restart: always
     container_name: spider_db
@@ -70,7 +70,7 @@ services:
       - TZ=Asia/Seoul
 
   master_db1:
-    platform: ubuntu:latest
+    platform: ubuntu
     image: mariadb:10.1
     restart: always
     container_name: master_db1
@@ -84,7 +84,7 @@ services:
       - /Users/miridih/miridih/project01/master_db1/:/etc/mysql/conf.d
 
   master_db2:
-    platform: ubuntu:latest
+    platform: ubuntu
     image: mariadb:10.1
     restart: always
     container_name: master_db2
@@ -98,7 +98,7 @@ services:
       - /Users/miridih/miridih/project01/master_db2/:/etc/mysql/conf.d
 
   slave_db1:
-    platform: ubuntu:latest
+    platform: ubuntu
     image: mariadb:10.1
     restart: always
     container_name: slave_db1
@@ -112,7 +112,7 @@ services:
       - /Users/miridih/miridih/project01/slave_db1/:/etc/mysql/conf.d
 
   slave_db2:
-    platform: ubuntu:latest
+    platform: ubuntu
     image: mariadb:10.1
     restart: always
     container_name: slave_db2
