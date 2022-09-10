@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://mysql:3306/project01
+    url: jdbc:mysql://spider_db:3306/project01
   redis:
     host: redis
     port: 6379

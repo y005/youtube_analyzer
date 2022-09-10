@@ -58,69 +58,113 @@ services:
       - /home/ubuntu/project01/redis:/var/lib/redis
 
   spider_db:
-    platform: ubuntu:18.04
+    platform: ubuntu:latest
     image: mariadb:10.1
     restart: always
     container_name: spider_db
     ports:
       - "3305:3306"
+    networks:
+      default_bridge:
+        ipv4_address: 192.168.0.2
     environment:
-      - MYSQL_DATABASE=database
+      - MYSQL_DATABASE=project01
       - MYSQL_ROOT_PASSWORD=samho101
       - TZ=Asia/Seoul
+    command:
+      - --lower_case_table_names=1
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - /Users/miridih/miridih/project01/spider_db/:/etc/mysql/conf.d
 
   master_db1:
-    platform: ubuntu:18.04
+    platform: ubuntu:latest
     image: mariadb:10.1
     restart: always
     container_name: master_db1
     ports:
       - "3307:3306"
+    networks:
+      default_bridge:
+        ipv4_address: 192.168.0.3
     environment:
-      - MYSQL_DATABASE=database
+      - MYSQL_DATABASE=project01
       - MYSQL_ROOT_PASSWORD=samho101
       - TZ=Asia/Seoul
+    command:
+      - --lower_case_table_names=1
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     volumes:
       - /Users/miridih/miridih/project01/master_db1/:/etc/mysql/conf.d
 
   master_db2:
-    platform: ubuntu:18.04
+    platform: ubuntu:latest
     image: mariadb:10.1
     restart: always
     container_name: master_db2
     ports:
       - "3308:3306"
+    networks:
+      default_bridge:
+        ipv4_address: 192.168.0.4
     environment:
-      - MYSQL_DATABASE=database
+      - MYSQL_DATABASE=project01
       - MYSQL_ROOT_PASSWORD=samho101
       - TZ=Asia/Seoul
+    command:
+      - --lower_case_table_names=1
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     volumes:
       - /Users/miridih/miridih/project01/master_db2/:/etc/mysql/conf.d
 
   slave_db1:
-    platform: ubuntu:18.04
+    platform: ubuntu:latest
     image: mariadb:10.1
     restart: always
     container_name: slave_db1
     ports:
       - "3309:3306"
+    networks:
+      default_bridge:
+        ipv4_address: 192.168.0.5
     environment:
-      - MYSQL_DATABASE=database
+      - MYSQL_DATABASE=project01
       - MYSQL_ROOT_PASSWORD=samho101
       - TZ=Asia/Seoul
+    command:
+      - --lower_case_table_names=1
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     volumes:
       - /Users/miridih/miridih/project01/slave_db1/:/etc/mysql/conf.d
 
   slave_db2:
-    platform: ubuntu:18.04
+    platform: ubuntu:latest
     image: mariadb:10.1
     restart: always
     container_name: slave_db2
     ports:
       - "3310:3306"
+    networks:
+      default_bridge:
+        ipv4_address: 192.168.0.6
     environment:
-      - MYSQL_DATABASE=database
+      - MYSQL_DATABASE=project01
       - MYSQL_ROOT_PASSWORD=samho101
       - TZ=Asia/Seoul
+    command:
+      - --lower_case_table_names=1
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     volumes:
       - /Users/miridih/miridih/project01/slave_db2/:/etc/mysql/conf.d
+
+networks:
+  default_bridge:
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.0.0/16
