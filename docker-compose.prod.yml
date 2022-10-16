@@ -58,8 +58,9 @@ services:
       - /home/ubuntu/project01/redis:/var/lib/redis
 
   spider_db:
+    platform: ubuntu:latest
     image: mariadb:10.1
-    restart: always
+    restart: on-failure
     container_name: spider_db
     ports:
       - "3305:3306"
@@ -75,11 +76,14 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
     volumes:
-      - /Users/miridih/miridih/project01/spider_db/:/etc/mysql/conf.d
+      - /home/ubuntu/project01/database/spider_db/docker-entrypoint.sh:/docker-entrypoint.sh
+      - /home/ubuntu/project01/database/spider_db/:/etc/mysql/conf.d
+      - /home/ubuntu/project01/database/spider_db/create.sql:/docker-entrypoint-initdb.d/create.sql
 
   master_db1:
+    platform: ubuntu:latest
     image: mariadb:10.1
-    restart: always
+    restart: on-failure
     container_name: master_db1
     ports:
       - "3307:3306"
@@ -94,12 +98,15 @@ services:
       - --lower_case_table_names=1
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+      - --bind-address=0.0.0.0
     volumes:
-      - /Users/miridih/miridih/project01/master_db1/:/etc/mysql/conf.d
+      - /home/ubuntu/project01/database/master_db1/docker-entrypoint.sh:/docker-entrypoint.sh
+      - /home/ubuntu/project01/database/master_db1/:/etc/mysql/conf.d
 
   master_db2:
+    platform: ubuntu:latest
     image: mariadb:10.1
-    restart: always
+    restart: on-failure
     container_name: master_db2
     ports:
       - "3308:3306"
@@ -114,12 +121,15 @@ services:
       - --lower_case_table_names=1
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+      - --bind-address=0.0.0.0
     volumes:
-      - /Users/miridih/miridih/project01/master_db2/:/etc/mysql/conf.d
+      - /home/ubuntu/project01/database/master_db2/docker-entrypoint.sh:/docker-entrypoint.sh
+      - /home/ubuntu/project01/database/master_db2/:/etc/mysql/conf.d
 
   slave_db1:
+    platform: ubuntu:latest
     image: mariadb:10.1
-    restart: always
+    restart: on-failure
     container_name: slave_db1
     ports:
       - "3309:3306"
@@ -134,12 +144,16 @@ services:
       - --lower_case_table_names=1
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+      - --bind-address=0.0.0.0
     volumes:
-      - /Users/miridih/miridih/project01/slave_db1/:/etc/mysql/conf.d
+      - /home/ubuntu/project01/database/slave_db1/docker-entrypoint.sh:/docker-entrypoint.sh
+      - /home/ubuntu/project01/database/slave_db1/restart_slave.sql:/docker-entrypoint-initdb.d/restart_slave.sql
+      - /home/ubuntu/project01/database/slave_db1/:/etc/mysql/conf.d
 
   slave_db2:
+    platform: ubuntu:latest
     image: mariadb:10.1
-    restart: always
+    restart: on-failure
     container_name: slave_db2
     ports:
       - "3310:3306"
@@ -154,8 +168,11 @@ services:
       - --lower_case_table_names=1
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+      - --bind-address=0.0.0.0
     volumes:
-      - /Users/miridih/miridih/project01/slave_db2/:/etc/mysql/conf.d
+      - /home/ubuntu/project01/database/slave_db2/docker-entrypoint.sh:/docker-entrypoint.sh
+      - /home/ubuntu/project01/database/slave_db2/restart_slave.sql:/docker-entrypoint-initdb.d/restart_slave.sql
+      - /home/ubuntu/project01/database/slave_db2/:/etc/mysql/conf.d
 
 networks:
   default_bridge:
