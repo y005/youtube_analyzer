@@ -3,6 +3,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.12.RELEASE'
     id 'org.asciidoctor.convert' version '1.5.8'
     id 'java'
+    id 'com.github.node-gradle.node' version '3.0.1'
 }
 
 group = 'com.example'
@@ -15,9 +16,24 @@ configurations {
     }
 }
 
+apply plugin: 'com.github.node-gradle.node'
+
 repositories {
     mavenCentral()
+    gradlePluginPortal()
 }
+
+node {
+    nodeProjectDir = file("${project.projectDir}/frontend")
+    version = '16.16.0'
+    download = true
+}
+
+task npmBuild(dependsOn: npmInstall, type: NpmTask) {
+    args = ['run', 'build']
+}
+
+compileJava.dependsOn 'npmBuild'
 
 ext {
     set('snippetsDir', file("build/generated-snippets"))
@@ -27,10 +43,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.2'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'mysql:mysql-connector-java'
     annotationProcessor 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'org.springframework.security:spring-security-test'
@@ -43,6 +61,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'io.springfox:springfox-swagger2:2.9.2'
     implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.2'
+    compileOnly 'com.querydsl:querydsl-apt:4.1.3'
+    implementation 'com.querydsl:querydsl-jpa:4.1.3'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 }
 
 tasks.named('test') {
@@ -53,4 +77,8 @@ tasks.named('test') {
 tasks.named('asciidoctor') {
     inputs.dir snippetsDir
     dependsOn test
+}
+
+clean {
+    delete file('src/main/generated')
 }
