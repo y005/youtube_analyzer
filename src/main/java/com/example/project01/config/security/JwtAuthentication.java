@@ -1,4 +1,4 @@
-package com.example.project01.security;
+package com.example.project01.config.security;
 
 import io.swagger.annotations.ApiParam;
 import lombok.Getter;

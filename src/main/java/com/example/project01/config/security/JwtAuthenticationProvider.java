@@ -1,6 +1,6 @@
-package com.example.project01.security;
+package com.example.project01.config.security;
 
-import com.example.project01.youtube.entity.User;
+import com.example.project01.youtube.model.User;
 import com.example.project01.youtube.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -37,13 +37,13 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     }
 
     private JwtAuthentication getJwtAuthentication(User user) {
-        String token = jwt.sign(Jwt.Claims.from(user.getUser_id(), user.getUser_roles().split(",")));
-        return new JwtAuthentication(token, user.getUser_id());
+        String token = jwt.sign(Jwt.Claims.from(user.getId(), user.getRole().split(",")));
+        return new JwtAuthentication(token, user.getId());
     }
 
     private List<GrantedAuthority> getAuthorities(User user) {
         List<GrantedAuthority> authorities;
-        authorities = Arrays.stream(user.getUser_roles().split(","))
+        authorities = Arrays.stream(user.getRole().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
         return authorities;

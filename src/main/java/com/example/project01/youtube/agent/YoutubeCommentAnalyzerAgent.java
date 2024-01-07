@@ -1,6 +1,6 @@
 package com.example.project01.youtube.agent;
 
-import com.example.project01.youtube.YoutubeConfig;
+import com.example.project01.config.api.YoutubeConfig;
 import com.example.project01.youtube.dto.CommentSentimentAnalysisRequest;
 import com.example.project01.youtube.dto.CommentSentimentAnalysisResponse;
 import lombok.RequiredArgsConstructor;

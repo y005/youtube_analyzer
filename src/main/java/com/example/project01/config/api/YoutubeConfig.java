@@ -1,4 +1,4 @@
-package com.example.project01.youtube;
+package com.example.project01.config.api;
 
 import lombok.Getter;
 import lombok.Setter;

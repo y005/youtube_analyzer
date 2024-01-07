@@ -1,12 +1,12 @@
 package com.example.project01.youtube.controller;
 
-import com.example.project01.security.JwtAuthentication;
-import com.example.project01.security.JwtAuthenticationProvider;
-import com.example.project01.security.JwtAuthenticationToken;
+import com.example.project01.config.security.JwtAuthentication;
+import com.example.project01.config.security.JwtAuthenticationProvider;
+import com.example.project01.config.security.JwtAuthenticationToken;
 import com.example.project01.youtube.agent.YoutubeTokenAgent;
 import com.example.project01.youtube.dto.*;
-import com.example.project01.youtube.entity.User;
-import com.example.project01.youtube.entity.YoutubeContent;
+import com.example.project01.youtube.model.User;
+import com.example.project01.youtube.model.YoutubeContent;
 import com.example.project01.youtube.service.UserService;
 import com.example.project01.youtube.service.YoutubeService;
 import com.google.api.services.youtube.model.Subscription;
@@ -62,9 +62,9 @@ public class YoutubeApiController {
 
     private User makeUser(String userId, String userPassword) {
         return User.builder()
-                .user_id(userId)
-                .user_password(userPassword)
-                .user_roles("ROLE_USER")
+                .id(userId)
+                .password(userPassword)
+                .role("ROLE_USER")
                 .build();
     }
 
@@ -83,7 +83,7 @@ public class YoutubeApiController {
             oauthRefreshToken = youtubeTokenAgent.getRefreshToken(code);
             userId = youtubeService.getUserYoutubeId(oauthRefreshToken.getAccess_token());
             youtubeService.saveToken(oauthRefreshToken.toRefreshToken(userId));
-            userService.save(User.builder().user_id(userId).user_roles("ROLE_USER").build());
+            userService.save(User.builder().id(userId).role("ROLE_USER").build());
         } catch (Exception e) {
             log.warn("redirect:fail {}", e.getMessage());
             return ResponseV1.error(HttpStatus.BAD_REQUEST, "에러 발생");
@@ -111,13 +111,12 @@ public class YoutubeApiController {
             @ApiImplicitParam(name = "token", required = true, paramType = "header", dataTypeClass = String.class),
     })
     @Cacheable(value = "youtube", key = "{#jwtAuthentication.userId, #pagingCondition}")
-    public ResponseV1 findYoutubeContent(@AuthenticationPrincipal JwtAuthentication jwtAuthentication, PagingCondition pagingCondition) {
+    public ResponseV1 findYoutubeContent(@AuthenticationPrincipal JwtAuthentication jwtAuthentication, @RequestParam YoutubeContentSearchParam searchParam, @RequestParam int page, @RequestParam int size) {
         log.info("youtube:content:{}", jwtAuthentication.getUserId());
         List<YoutubeContentResponse> youtubeContents;
         PagingResponse<YoutubeContentResponse> result = new PagingResponse<>();
         try {
-            pagingCondition.init();
-            youtubeContents = youtubeService.findYoutubeContent(jwtAuthentication.getUserId(), pagingCondition)
+            youtubeContents = youtubeService.findYoutubeContent(searchParam, page, size)
                     .stream()
                     .map(YoutubeContentResponse::from)
                     .collect(Collectors.toList());
@@ -125,8 +124,10 @@ public class YoutubeApiController {
             log.warn("youtube:content:{} {}", jwtAuthentication.getUserId(), e.getMessage());
             return ResponseV1.error(HttpStatus.FORBIDDEN, "허용되지 않은 접근");
         }
-        return ResponseV1.ok(result.from(pagingCondition, youtubeContents));
+        return ResponseV1.ok(result.from(page, size, youtubeContents));
     }
+
+    //  TODO 추가 검색 api 만들기 (관련 키워드 영상 정보)
 
     @GetMapping("/crawling")
     @ApiOperation(value="구독 채널 영상 정보 크롤링", notes="가입한 모든 유저에 대해 새로 올라온 구독 채널 영상 정보를 수집한다. (관리자 계정만 사용 가능)")
@@ -140,23 +141,23 @@ public class YoutubeApiController {
 
     @Scheduled(cron = "0 0 8 * * *")
     public void crawlingYoutubeContent() {
-        int offset = 0;
+        int page = 0;
         List<User> users;
         int MAX_USER = 300;
         log.info("Youtube Content Crawling start :)");
         do {
-            users = userService.getEveryUser(offset, MAX_USER);
+            users = userService.getEveryUser(page, MAX_USER);
             users.forEach(
                     (user) -> {
                         try {
-                            youtubeService.getYoutubeContent(user.getUser_id());
-                            log.info("youtube:crawl:success {}", user.getUser_id());
+                            youtubeService.getYoutubeContent(user.getId());
+                            log.info("youtube:crawl:success {}", user.getId());
                         } catch (Exception e) {
-                            log.warn("youtube:crawl:fail {} {}", user.getUser_id(), e.getMessage());
+                            log.warn("youtube:crawl:fail {} {}", user.getId(), e.getMessage());
                         }
                     }
             );
-            offset += users.size();
+            ++page;
         } while (users.size() == MAX_USER);
     }
 

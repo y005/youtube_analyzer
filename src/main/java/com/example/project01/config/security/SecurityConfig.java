@@ -1,4 +1,4 @@
-package com.example.project01.security;
+package com.example.project01.config.security;
 
 import com.example.project01.youtube.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 
 @Configuration
 public class SecurityConfig {
@@ -20,7 +20,9 @@ public class SecurityConfig {
             "/youtube/login/**",
             "/youtube/redirect/**",
             "/youtube/oauth/**",
-            "/youtube/signup/**"
+            "/youtube/signup/**",
+            "/main/**",
+            "/asset/**"
     };
     private static final String[] AUTH_ADMIN_LIST = {
             "/youtube/crawling/**"
@@ -76,7 +78,7 @@ public class SecurityConfig {
                 .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and()
-                .addFilterAfter(jwtAuthenticationFilter(), SecurityContextPersistenceFilter.class);
+                .addFilterAfter(jwtAuthenticationFilter(), SecurityContextHolderFilter.class);
         return http.build();
     }
 }

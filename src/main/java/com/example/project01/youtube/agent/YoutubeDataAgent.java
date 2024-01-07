@@ -1,6 +1,6 @@
 package com.example.project01.youtube.agent;
 
-import com.example.project01.youtube.entity.YoutubeContent;
+import com.example.project01.youtube.model.YoutubeContent;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.*;
 import lombok.RequiredArgsConstructor;
@@ -113,7 +113,7 @@ public class YoutubeDataAgent {
                 .subscribe_count(subscriptionCountInfo.get(snippet.getChannelId()))
                 .channel_name(snippet.getChannelTitle())
                 .view_count(statistics.getViewCount())
-                .like_Count(statistics.getLikeCount())
+                .like_count(statistics.getLikeCount())
                 .dislike_count(statistics.getDislikeCount())
                 .comments(comments)
                 .published_time(new Date(snippet.getPublishedAt().getValue()))

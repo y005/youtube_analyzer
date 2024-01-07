@@ -1,6 +1,6 @@
 package com.example.project01.youtube.dto;
 
-import com.example.project01.youtube.entity.RefreshToken;
+import com.example.project01.youtube.model.RefreshToken;
 import lombok.Data;
 
 @Data

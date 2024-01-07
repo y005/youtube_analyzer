@@ -1,4 +1,4 @@
-package com.example.project01.security;
+package com.example.project01.config.security;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;

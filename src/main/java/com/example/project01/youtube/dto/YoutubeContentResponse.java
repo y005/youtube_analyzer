@@ -1,6 +1,6 @@
 package com.example.project01.youtube.dto;
 
-import com.example.project01.youtube.entity.YoutubeContent;
+import com.example.project01.youtube.model.YoutubeContent;
 import lombok.Builder;
 import lombok.Data;
 
@@ -32,12 +32,11 @@ public class YoutubeContentResponse implements Serializable {
                 .subscribe_count(youtubeContent.getSubscribe_count())
                 .video_id(youtubeContent.getVideo_id())
                 .view_count(youtubeContent.getView_count())
-                .like_Count(youtubeContent.getLike_Count())
+                .like_Count(youtubeContent.getLike_count())
                 .dislike_count(youtubeContent.getDislike_count())
                 .published_time(youtubeContent.getPublished_time())
                 .percent(youtubeContent.getPercent())
                 .keywords(youtubeContent.getKeywords())
-                .user_id(youtubeContent.getUser_id())
                 .build();
     }
 }

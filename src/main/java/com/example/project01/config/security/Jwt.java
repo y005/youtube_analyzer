@@ -1,4 +1,4 @@
-package com.example.project01.security;
+package com.example.project01.config.security;
 
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.JWTVerifier;

@@ -1,4 +1,4 @@
-package com.example.project01.youtube;
+package com.example.project01.config.api;
 
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;

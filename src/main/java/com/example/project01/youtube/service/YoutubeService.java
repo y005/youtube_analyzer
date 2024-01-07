@@ -5,53 +5,57 @@ import com.example.project01.youtube.agent.YoutubeDataAgent;
 import com.example.project01.youtube.agent.YoutubeTokenAgent;
 import com.example.project01.youtube.dto.CommentSentimentAnalysisResponse;
 import com.example.project01.youtube.dto.OauthAccessToken;
-import com.example.project01.youtube.dto.PagingCondition;
-import com.example.project01.youtube.entity.RefreshToken;
-import com.example.project01.youtube.entity.YoutubeContent;
-import com.example.project01.youtube.repository.YoutubeContentRepository;
-import com.example.project01.youtube.repository.YoutubeTokenRepository;
+import com.example.project01.youtube.dto.YoutubeContentSearchParam;
+import com.example.project01.youtube.model.RefreshToken;
+import com.example.project01.youtube.model.YoutubeContent;
+import com.example.project01.youtube.mapper.YoutubeContentMapper;
+import com.example.project01.youtube.mapper.YoutubeTokenMapper;
+import com.example.project01.youtube.repository.YoutubeContentQdslRepository;
 import com.google.api.services.youtube.model.Subscription;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class YoutubeService {
-    private final YoutubeTokenRepository youtubeTokenRepository;
-
-    private final YoutubeContentRepository youtubeContentRepository;
-
+    private final YoutubeTokenMapper youtubeTokenMapper;
+    private final YoutubeContentMapper youtubeContentMapper;
+    private final YoutubeContentQdslRepository youtubeContentQdslRepository;
     private final YoutubeTokenAgent youtubeTokenAgent;
-
     private final YoutubeDataAgent youtubeDataAgent;
-
     private final YoutubeCommentAnalyzerAgent youtubeCommentAnalyzerAgent;
 
     @Transactional
     public void saveToken(RefreshToken refreshToken) {
-        youtubeTokenRepository.save(refreshToken);
+        youtubeTokenMapper.save(refreshToken);
     }
 
-    @Transactional(readOnly = true)
-    public List<YoutubeContent> findYoutubeContent(String id, PagingCondition pagingCondition) {
-        return youtubeContentRepository.findByUserId(id, pagingCondition.getOffset(), pagingCondition.getSize());
+    public List<YoutubeContent> findYoutubeContent(YoutubeContentSearchParam searchParam, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return youtubeContentQdslRepository.findByParam(searchParam, pageable)
+                .stream()
+                .map(YoutubeContent::of)
+                .collect(Collectors.toList());
     }
 
     public String getUserYoutubeId(String access_token) throws IOException {
         return youtubeDataAgent.getUserId(access_token);
     }
 
+    @Transactional
     public List<YoutubeContent> getYoutubeContent(String id) throws IOException {
         OauthAccessToken access_token = getAccessToken(id);
         List<YoutubeContent> youtubeContentList = youtubeDataAgent.getYoutubeContent(access_token.getAccess_token());
         for (YoutubeContent element : youtubeContentList) {
             try {
-                element.setUser_id(id);
                 if (element.getComments() != null) {
                     CommentSentimentAnalysisResponse commentSentimentAnalysisResponse = youtubeCommentAnalyzerAgent.getCommentAnalysis(element.getComments());
                     if (commentSentimentAnalysisResponse.valid()){
@@ -59,7 +63,7 @@ public class YoutubeService {
                         element.setKeywords(commentSentimentAnalysisResponse.getKeywords());
                     }
                 }
-                youtubeContentRepository.save(element);
+                youtubeContentMapper.save(element);
             } catch (Exception e) {
                 throw e;
             }
@@ -71,9 +75,8 @@ public class YoutubeService {
         return youtubeDataAgent.getSubscribeInfo(getAccessToken(id).getAccess_token());
     }
 
-    @Transactional(readOnly = true)
     public RefreshToken getRefreshToken(String id) {
-        return youtubeTokenRepository.findByUserId(id);
+        return youtubeTokenMapper.findByUserId(id);
     }
 
     private OauthAccessToken getAccessToken(String id) {
@@ -81,17 +84,25 @@ public class YoutubeService {
         return youtubeTokenAgent.getAccessToken(refreshToken.getRefresh_token());
     }
 
-
     @Transactional
     public void sentiment() {
-        List<YoutubeContent> youtubeContentList = youtubeContentRepository.getAll();
-        youtubeContentList.forEach((content)->{
-            if (content.getPercent() == null) {
-                CommentSentimentAnalysisResponse commentSentimentAnalysisResponse = youtubeCommentAnalyzerAgent.getCommentAnalysis(content.getComments());
-                content.setKeywords(commentSentimentAnalysisResponse.getKeywords());
-                content.setPercent((double) commentSentimentAnalysisResponse.getPercent());
-                youtubeContentRepository.update(content);
-            }
-        });
+        int page = 0;
+        List<YoutubeContent> youtubeContentList;
+        int MAX_SIZE = 300;
+        do {
+            youtubeContentList = youtubeContentQdslRepository.findByParam(YoutubeContentSearchParam.of(null, null), PageRequest.of(page, MAX_SIZE))
+                    .stream()
+                    .map(YoutubeContent::of)
+                    .collect(Collectors.toList());
+            youtubeContentList.forEach((content)->{
+                if (content.getPercent() == null) {
+                    CommentSentimentAnalysisResponse commentSentimentAnalysisResponse = youtubeCommentAnalyzerAgent.getCommentAnalysis(content.getComments());
+                    content.setKeywords(commentSentimentAnalysisResponse.getKeywords());
+                    content.setPercent((double) commentSentimentAnalysisResponse.getPercent());
+                    youtubeContentMapper.update(content);
+                }
+            });
+            ++page;
+        } while (youtubeContentList.size() == MAX_SIZE);
     }
 }
