@@ -5,6 +5,7 @@ import com.example.project01.config.security.JwtAuthenticationProvider;
 import com.example.project01.config.security.JwtAuthenticationToken;
 import com.example.project01.youtube.agent.YoutubeTokenAgent;
 import com.example.project01.youtube.dto.*;
+import com.example.project01.youtube.enums.RoleType;
 import com.example.project01.youtube.model.User;
 import com.example.project01.youtube.model.YoutubeContent;
 import com.example.project01.youtube.service.UserService;
@@ -25,6 +26,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,7 +66,7 @@ public class YoutubeApiController {
         return User.builder()
                 .id(userId)
                 .password(userPassword)
-                .role("ROLE_USER")
+                .roles(Collections.singletonList(RoleType.ROLE_USER))
                 .build();
     }
 
@@ -83,7 +85,7 @@ public class YoutubeApiController {
             oauthRefreshToken = youtubeTokenAgent.getRefreshToken(code);
             userId = youtubeService.getUserYoutubeId(oauthRefreshToken.getAccess_token());
             youtubeService.saveToken(oauthRefreshToken.toRefreshToken(userId));
-            userService.save(User.builder().id(userId).role("ROLE_USER").build());
+            userService.save(User.builder().id(userId).roles(Collections.singletonList(RoleType.ROLE_USER)).build());
         } catch (Exception e) {
             log.warn("redirect:fail {}", e.getMessage());
             return ResponseV1.error(HttpStatus.BAD_REQUEST, "에러 발생");

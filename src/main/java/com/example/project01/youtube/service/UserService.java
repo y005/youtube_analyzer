@@ -5,6 +5,7 @@ import com.example.project01.youtube.entity.UserEntity;
 import com.example.project01.youtube.model.User;
 import com.example.project01.youtube.mapper.UserMapper;
 import com.example.project01.youtube.repository.UserQdslRepository;
+import com.example.project01.youtube.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class UserService {
     private final UserMapper userMapper;
+    private final UserRepository userRepository;
     private final UserQdslRepository userQdslRepository;
 
     public User findByUsername(String userId) {
@@ -33,7 +35,8 @@ public class UserService {
 
     @Transactional
     public void save(User user) {
-        userMapper.save(user);
+        UserEntity userEntity = new UserEntity(user);
+        userRepository.save(userEntity);
     }
 
     public User login(String userId, String userPassword) {

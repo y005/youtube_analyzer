@@ -37,13 +37,15 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     }
 
     private JwtAuthentication getJwtAuthentication(User user) {
-        String token = jwt.sign(Jwt.Claims.from(user.getId(), user.getRole().split(",")));
+        String token = jwt.sign(Jwt.Claims.from(user.getId(), user.getRoles()));
         return new JwtAuthentication(token, user.getId());
     }
 
     private List<GrantedAuthority> getAuthorities(User user) {
         List<GrantedAuthority> authorities;
-        authorities = Arrays.stream(user.getRole().split(","))
+        authorities = user.getRoles()
+                .stream()
+                .map(Enum::name)
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
         return authorities;
