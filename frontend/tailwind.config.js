@@ -10,15 +10,12 @@ export default {
   plugins: [
     (({ addUtilities }) => {
       addUtilities({
-        '.content-auto': {
-          'content-visibility': 'auto',
+        '.container': {
+          '@apply bg-white border rounded-lg shadow m-1 p-5': '',
         },
-        '.content-hidden': {
-          'content-visibility': 'hidden',
-        },
-        '.content-visible': {
-          'content-visibility': 'visible',
-        },
+        '.input': {
+          '@apply border border-2 rounded-lg': {}
+        }
       })
     })
   ],
