@@ -6,10 +6,11 @@ import com.example.project01.youtube.agent.YoutubeTokenAgent;
 import com.example.project01.youtube.dto.CommentSentimentAnalysisResponse;
 import com.example.project01.youtube.dto.OauthAccessToken;
 import com.example.project01.youtube.dto.YoutubeContentSearchParam;
+import com.example.project01.youtube.entity.RefreshTokenEntity;
 import com.example.project01.youtube.model.RefreshToken;
 import com.example.project01.youtube.model.YoutubeContent;
 import com.example.project01.youtube.mapper.YoutubeContentMapper;
-import com.example.project01.youtube.mapper.YoutubeTokenMapper;
+import com.example.project01.youtube.repository.RefreshTokenRepository;
 import com.example.project01.youtube.repository.YoutubeContentQdslRepository;
 import com.google.api.services.youtube.model.Subscription;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class YoutubeService {
-    private final YoutubeTokenMapper youtubeTokenMapper;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final YoutubeContentMapper youtubeContentMapper;
     private final YoutubeContentQdslRepository youtubeContentQdslRepository;
     private final YoutubeTokenAgent youtubeTokenAgent;
@@ -35,7 +37,7 @@ public class YoutubeService {
 
     @Transactional
     public void saveToken(RefreshToken refreshToken) {
-        youtubeTokenMapper.save(refreshToken);
+        refreshTokenRepository.save(new RefreshTokenEntity(refreshToken));
     }
 
     public List<YoutubeContent> findYoutubeContent(YoutubeContentSearchParam searchParam, int page, int size) {
@@ -75,13 +77,14 @@ public class YoutubeService {
         return youtubeDataAgent.getSubscribeInfo(getAccessToken(id).getAccess_token());
     }
 
-    public RefreshToken getRefreshToken(String id) {
-        return youtubeTokenMapper.findByUserId(id);
+    public RefreshToken getRefreshToken(String userId) {
+        Optional<RefreshTokenEntity> entityOptional = refreshTokenRepository.findByUser_Id(userId);
+        return entityOptional.orElseThrow(RuntimeException::new);
     }
 
     private OauthAccessToken getAccessToken(String id) {
         RefreshToken refreshToken = getRefreshToken(id);
-        return youtubeTokenAgent.getAccessToken(refreshToken.getRefresh_token());
+        return youtubeTokenAgent.getAccessToken(refreshToken.getRefreshToken());
     }
 
     @Transactional

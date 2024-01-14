@@ -1,5 +1,5 @@
 package com.example.project01.youtube.enums;
 
 public enum RoleType {
-    ROLE_USER,
+    ROLE_USER, ROLE_ADMIN
 }

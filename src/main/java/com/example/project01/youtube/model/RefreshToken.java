@@ -6,7 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class RefreshToken {
-    private Long id;
-    private String user_id;
-    private String refresh_token;
+    private String userId;
+    private String refreshToken;
 }
