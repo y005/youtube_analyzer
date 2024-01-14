@@ -14,20 +14,4 @@
         insert into user(id, password, roles)
         values(#{param.id}, #{param.password}, #{param.role});
     </insert>
-
-    <select id="findByUserIdWithPassword" resultType="com.example.project01.youtube.model.User">
-        select *
-        from user
-        where id = #{user_id}
-        <if test="user_password != null">
-            and password = #{user_password}
-        </if>;
-    </select>
-
-    <select id="getEveryUser" resultType="com.example.project01.youtube.model.User">
-        select *
-        from user
-        limit #{limit}
-        offset #{offset};
-    </select>
 </mapper>
