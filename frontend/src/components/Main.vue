@@ -1,6 +1,7 @@
 <script setup>
 import {onMounted, ref, toRaw} from "vue";
 import {youtubeService} from "../api/youtubeService.js";
+import Info from "./common/Info.vue";
 
 const loginForm = ref({userId: "", password: ""})
 const youtubeId = ref("")
@@ -49,93 +50,113 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="bg-white border rounded-lg shadow flex justify-between m-1 p-3 items-center">
-        <div class="p-1 border rounded-lg bg-red-600">
-            <a href="#" class="text-white font-bold">Youtube Analyzer</a>
-        </div>
-        <div class="w-96">
-            <div class="flex">
-                <input
-                    class="w-full input mr-3"
-                    type="text"
-                    v-model.trim="keyword"
-                    placeholder=" search video">
-                <button
-                    class="border rounded-lg p-1 hover:bg-gray-100"
-                    type="button"
-                    @click="search">
-                    Search
-                </button>
+    <div class="bg-gray-100 h-screen">
+        <div class="bg-white border rounded-lg shadow flex justify-between mt-2 mx-1 my-1 mb-1 p-3 items-center">
+            <div class="p-1 border rounded-lg bg-red-600">
+                <a href="#" class="text-white font-bold">Youtube Analyzer</a>
             </div>
-        </div>
-        <div class="flex justify-end items-center">
-            <form>
-                <div class="flex justify-between">
-                    <span class="mr-1">ID</span>
+            <div class="w-1/3">
+                <div class="flex">
                     <input
-                        class="input"
+                        class="w-full input mr-2"
                         type="text"
-                        v-model.trim="loginForm.userId">
-                </div>
-                <div class="flex justify-between">
-                    <span class="mr-4">PASSWD</span>
-                    <input
-                        class="input"
-                        type="password"
-                        v-model.trim="loginForm.password">
-                </div>
-                <div class="flex justify-between mt-2">
+                        v-model.trim="keyword"
+                        placeholder=" search video">
                     <button
-                        class="border rounded-lg px-0.5 py-1 hover:bg-gray-100"
+                        class="border rounded-lg p-1 hover:bg-gray-100"
                         type="button"
-                        @click="oauth">
-                        Youtube Oauth
-                    </button>
-                    <button
-                        class="border rounded-lg px-2 py-1 mr-1 hover:bg-gray-100"
-                        type="button"
-                        @click="login">
-                        Login
+                        @click="search">
+                        Search
                     </button>
                 </div>
-            </form>
+            </div>
+            <div class="flex justify-end items-center">
+                <form>
+                    <div class="flex justify-between">
+                        <span class="mr-1">ID</span>
+                        <input
+                            class="input"
+                            type="text"
+                            v-model.trim="loginForm.userId">
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="mr-4">PASSWD</span>
+                        <input
+                            class="input"
+                            type="password"
+                            v-model.trim="loginForm.password">
+                    </div>
+                    <div class="flex justify-between mt-2">
+                        <button
+                            class="border rounded-lg px-0.5 py-1 hover:bg-gray-100"
+                            type="button"
+                            @click="oauth">
+                            Youtube Oauth
+                        </button>
+                        <button
+                            class="border rounded-lg px-2 py-1 mr-1 hover:bg-gray-100"
+                            type="button"
+                            @click="login">
+                            Login
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-    <div class="h-screen">
-        <div class="flex justify-around text-sm text-gray-700">
-            <div class="w-1/2 container text-2xl">
-                <h3 class="font-bold">13</h3>
-                <div class="flex justify-between">
-                    <span class="font-medium text-sm">구독 중인 채널 수</span>
-                    <span class="text-red-500 font-medium">+1</span>
+        <div>
+            <div class="flex justify-around text-sm text-gray-700">
+                <div class="w-1/2 container text-2xl">
+                    <info
+                        :count="13"
+                        title="구독 중인 채널 수"
+                        :diff="1"
+                    ></info>
+                </div>
+                <div class="w-1/2 container text-2xl">
+                    <info
+                        :count="10"
+                        title="오늘 새로 업로드 된 영상 수"
+                        :diff="10"
+                    ></info>
                 </div>
             </div>
-            <div class="w-1/2 container text-2xl">
-                <h3 class="font-bold">10</h3>
-                <div class="flex justify-between">
-                    <span class="font-medium text-sm">오늘 새로 업로드 된 영상 수</span>
-                    <span class="text-red-500 font-medium">+10</span>
+            <div class="flex justify-between h-80">
+                <div
+                    class="w-2/5 rounded-lg bg-white border m-1 p-5 shadow flex justify-center items-center"
+                    v-if="youtubeId.length > 0">
+                    <iframe
+                        :src="'https://www.youtube.com/embed/' + youtubeId"
+                        title="YouTube Player"
+                        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen/>
+                </div>
+                <div
+                    class="w-2/5 rounded-lg bg-white border m-1 p-5 shadow flex justify-center items-center"
+                    v-else>
+                    <div>보고 싶은 채널 영상을 클릭하세요</div>
+                </div>
+                <div class="w-3/5 container p-3">
+                    <h4 class="ml-2 text-xl font-bold text-gray-700">인기 댓글</h4>
+                    <hr class="my-2">
+                    <div v-if="commentInfos.length === 0">
+                        <h5 class="font-medium text-gray-700">
+                            댓글이 없습니다.
+                        </h5>
+                    </div>
+                    <div
+                        v-else
+                        v-for="comment in commentInfos"
+                        class="flex justify-around text-gray-700 text-sm font-medium">
+                        <div>{{ comment.userId }}</div>
+                        <div>{{ comment.content }}</div>
+                        <div>{{ comment.likeCount }}</div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="flex justify-center rounded-lg border m-1 p-5 shadow">
-            <iframe
-                v-if="youtubeId.length > 0"
-                class="w-3/4 h-3/4"
-                :src="'https://www.youtube.com/embed/' + youtubeId"
-                title="YouTube Player"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen/>
-            <div v-else
-                class="w-3/4 h-3/4 flex justify-center">
-                채널 영상을 클릭하세요
-            </div>
-        </div>
-        <div class="flex justify-around">
-            <div class="w-2/3 container p-3">
+            <div class="rounded-lg bg-white border m-1 p-5 shadow h-max">
                 <h4 class="ml-2 text-xl font-bold text-gray-700">채널 영상 분석</h4>
                 <hr class="my-2">
-                <div class="flex text-gray-700 text-sm font-medium text-center">
+                <div class="flex text-gray-700 text-sm font-medium text-center border rounded-lg mb-2 py-0.5">
                     <div class="w-1/6">채널명</div>
                     <div class="w-1/6">제목</div>
                     <div class="w-1/6">조회수</div>
@@ -153,30 +174,13 @@ onMounted(() => {
                     <div class="w-1/6">{{ youtubeInfo.likeCount }}</div>
                     <div class="w-1/6">{{ youtubeInfo.sentimentRatio + "%" }}</div>
                     <div class="w-1/6">
-                        <span
-                            @click="search(keyword)"
-                            v-for="keyword in youtubeInfo.relatedKeyword"
-                            class="bg-gray-400 text-white px-1 m-0.5 rounded">
-                            {{ keyword }}
-                        </span>
+                    <span
+                        @click="search(keyword)"
+                        v-for="keyword in youtubeInfo.relatedKeyword"
+                        class="bg-gray-400 text-white px-1 m-0.5 rounded">
+                        {{ keyword }}
+                    </span>
                     </div>
-                </div>
-            </div>
-            <div class="w-1/3 container p-3">
-                <h4 class="ml-2 text-xl font-bold text-gray-700">인기 댓글</h4>
-                <hr class="my-2">
-                <div v-if="commentInfos.length === 0">
-                    <h5 class="font-medium text-gray-700">
-                        댓글이 없습니다.
-                    </h5>
-                </div>
-                <div
-                    v-else
-                    v-for="comment in commentInfos"
-                    class="flex justify-around text-gray-700 text-sm font-medium">
-                    <div>{{ comment.userId }}</div>
-                    <div>{{ comment.content }}</div>
-                    <div>{{ comment.likeCount }}</div>
                 </div>
             </div>
         </div>
