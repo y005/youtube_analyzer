@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     proxy: {
-      '/api': 'http://localhost:8080'
+      '/youtube': 'http://localhost:8080'
     },
   },
   build: {
