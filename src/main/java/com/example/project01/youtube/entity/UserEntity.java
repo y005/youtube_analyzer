@@ -31,6 +31,7 @@ public class UserEntity {
         this.id = user.getId();
         this.password = user.getPassword();
         this.roleList = user.getRoles();
+        setRoles();
     }
 
     @PostLoad
@@ -40,9 +41,7 @@ public class UserEntity {
                 .collect(Collectors.toList());
     }
 
-    @PreUpdate
-    @PrePersist
-    public void writeRoleList() {
+    public void setRoles() {
         this.roles = this.roleList.stream()
                 .map(RoleType::name)
                 .collect(Collectors.joining(","));

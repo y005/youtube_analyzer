@@ -85,7 +85,7 @@ public class YoutubeApiController {
             oauthRefreshToken = youtubeTokenAgent.getRefreshToken(code);
             userId = youtubeService.getUserYoutubeId(oauthRefreshToken.getAccess_token());
             youtubeService.saveToken(oauthRefreshToken.toRefreshToken(userId));
-            userService.save(User.builder().id(userId).roles(Collections.singletonList(RoleType.ROLE_USER)).build());
+            userService.save(makeUser(userId, "1234"));
         } catch (Exception e) {
             log.warn("redirect:fail {}", e.getMessage());
             return ResponseV1.error(HttpStatus.BAD_REQUEST, "에러 발생");

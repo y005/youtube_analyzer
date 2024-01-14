@@ -12,8 +12,8 @@ public class OauthRefreshToken {
 
     public RefreshToken toRefreshToken(String userId) {
         return RefreshToken.builder()
-                .user_id(userId)
-                .refresh_token(this.refresh_token)
+                .userId(userId)
+                .refreshToken(this.refresh_token)
                 .build();
     }
 }
