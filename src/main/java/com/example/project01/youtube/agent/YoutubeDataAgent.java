@@ -28,8 +28,8 @@ public class YoutubeDataAgent {
     public final long MAX_COMMENT_COUNT = 100L;
     private final YouTube youtube;
 
-    public String getUserId(String access_token) throws IOException {
-        YouTube.Channels.List request = makeUserRequest(access_token);
+    public String getUserId(String accessToken) throws IOException {
+        YouTube.Channels.List request = makeUserRequest(accessToken);
         try {
             ChannelListResponse response = request.execute();
             return response.getItems().get(0).getSnippet().getTitle();
@@ -38,22 +38,22 @@ public class YoutubeDataAgent {
         }
     }
 
-    public List<YoutubeContent> getYoutubeContent(String access_token) throws IOException {
-        List<Subscription> subscriptionList = getSubscribeInfo(access_token);
+    public List<YoutubeContent> getYoutubeContent(String accessToken) throws IOException {
+        List<Subscription> subscriptionList = getSubscribeInfo(accessToken);
         List<String> channelIdList = subscriptionList.stream().map(e->e.getSnippet().getResourceId().getChannelId()).collect(Collectors.toList());
-        Map<String, BigInteger> subscriptionCountInfo = getSubscriptionCountRequest(access_token, channelIdList);
-        List<String> videoIdList = getRecentVideoId(access_token, channelIdList);
-        return getVideoInfo(access_token, videoIdList, subscriptionCountInfo);
+        Map<String, BigInteger> subscriptionCountInfo = getSubscriptionCountRequest(accessToken, channelIdList);
+        List<String> videoIdList = getRecentVideoId(accessToken, channelIdList);
+        return getVideoInfo(accessToken, videoIdList, subscriptionCountInfo);
     }
 
-    public List<Subscription> getSubscribeInfo(String access_token) throws IOException {
-        YouTube.Subscriptions.List request = makeSubscriptionRequest(access_token);
+    public List<Subscription> getSubscribeInfo(String accessToken) throws IOException {
+        YouTube.Subscriptions.List request = makeSubscriptionRequest(accessToken);
         SubscriptionListResponse response = request.execute();
         return response.getItems();
     }
 
-    private Map<String, BigInteger> getSubscriptionCountRequest(String access_token, List<String> channelIdList) throws IOException {
-        YouTube.Channels.List request = makeSubscriptionCountRequest(access_token, channelIdList);
+    private Map<String, BigInteger> getSubscriptionCountRequest(String accessToken, List<String> channelIdList) throws IOException {
+        YouTube.Channels.List request = makeSubscriptionCountRequest(accessToken, channelIdList);
         try {
             ChannelListResponse response = request.execute();
             return response.getItems().stream().collect(Collectors.toMap(Channel::getId, (e)->e.getStatistics().getSubscriberCount()));
@@ -62,12 +62,12 @@ public class YoutubeDataAgent {
         }
     }
 
-    private List<String> getRecentVideoId(String access_token, List<String> channelIdList) {
+    private List<String> getRecentVideoId(String accessToken, List<String> channelIdList) {
         List<String> recentVideoIdList = new ArrayList<>();
         channelIdList.forEach(
                 (channelId) -> {
                     try {
-                       SearchListResponse response = makeRecentYoutubeContentRequest(access_token, channelId).execute();
+                       SearchListResponse response = makeRecentYoutubeContentRequest(accessToken, channelId).execute();
                        response.getItems().forEach(e->recentVideoIdList.add(e.getId().getVideoId()));
                     } catch (Exception e) {
                         throw new RuntimeException("채널 영상 정보 탐색에서 에러 발생");
@@ -77,11 +77,11 @@ public class YoutubeDataAgent {
         return recentVideoIdList;
     }
 
-    private List<YoutubeContent> getVideoInfo(String access_token, List<String> videoIdList, Map<String, BigInteger> subscriptionCountInfo) {
+    private List<YoutubeContent> getVideoInfo(String accessToken, List<String> videoIdList, Map<String, BigInteger> subscriptionCountInfo) {
         return videoIdList.stream().map(
                 (videoId)->{
                     try {
-                        return makeYoutubeContent(access_token, videoId, subscriptionCountInfo);
+                        return makeYoutubeContent(accessToken, videoId, subscriptionCountInfo);
                     } catch (Exception e) {
                         throw new RuntimeException("유튜브 정보 분석에서 에러 발생");
                     }
@@ -90,18 +90,18 @@ public class YoutubeDataAgent {
                 .collect(Collectors.toList());
     }
 
-    private YouTube.Channels.List makeUserRequest(String access_token) throws IOException {
+    private YouTube.Channels.List makeUserRequest(String accessToken) throws IOException {
         YouTube.Channels.List request = youtube.channels().list(Collections.singletonList(SNIPPET));
-        request.setAccessToken(access_token);
+        request.setAccessToken(accessToken);
         request.setMine(true);
         return request;
     }
 
-    private YoutubeContent makeYoutubeContent(String access_token, String videoId, Map<String, BigInteger> subscriptionCountInfo) throws IOException {
-        VideoListResponse response1 = makeVideoInfoRequest(access_token, videoId).execute();
+    private YoutubeContent makeYoutubeContent(String accessToken, String videoId, Map<String, BigInteger> subscriptionCountInfo) throws IOException {
+        VideoListResponse response1 = makeVideoInfoRequest(accessToken, videoId).execute();
         VideoSnippet snippet = response1.getItems().get(0).getSnippet();
         VideoStatistics statistics = response1.getItems().get(0).getStatistics();
-        CommentThreadListResponse response2 = makeVideoCommentRequest(access_token, videoId).execute();
+        CommentThreadListResponse response2 = makeVideoCommentRequest(accessToken, videoId).execute();
         List<String> commentList = response2.getItems().stream().map(
                 e-> e.getSnippet().getTopLevelComment().getSnippet().getTextOriginal()
         ).collect(Collectors.toList());
@@ -120,25 +120,25 @@ public class YoutubeDataAgent {
                 .build();
     }
 
-    private YouTube.Subscriptions.List makeSubscriptionRequest(String access_token) throws IOException {
+    private YouTube.Subscriptions.List makeSubscriptionRequest(String accessToken) throws IOException {
         YouTube.Subscriptions.List request = youtube.subscriptions().list(Collections.singletonList(SNIPPET));
-        request.setAccessToken(access_token);
+        request.setAccessToken(accessToken);
         request.setMaxResults(MAX_CHANNEL_COUNT);
         request.setOrder(UNREAD);
         request.setMine(true);
         return request;
     }
 
-    private YouTube.Channels.List makeSubscriptionCountRequest(String access_token, List<String> channelIdList) throws IOException {
+    private YouTube.Channels.List makeSubscriptionCountRequest(String accessToken, List<String> channelIdList) throws IOException {
         YouTube.Channels.List request = youtube.channels().list(Collections.singletonList(STATISTICS));
-        request.setAccessToken(access_token);
+        request.setAccessToken(accessToken);
         request.setId(channelIdList);
         return request;
     }
 
-    private YouTube.Search.List makeRecentYoutubeContentRequest(String access_token,String channelId) throws IOException {
+    private YouTube.Search.List makeRecentYoutubeContentRequest(String accessToken,String channelId) throws IOException {
         YouTube.Search.List request = youtube.search().list(Collections.singletonList(ID));
-        request.setAccessToken(access_token);
+        request.setAccessToken(accessToken);
         request.setChannelId(channelId);
         request.setOrder(DATE);
         request.setType(Collections.singletonList(VIDEO));
@@ -147,17 +147,17 @@ public class YoutubeDataAgent {
         return request;
     }
 
-    private YouTube.Videos.List makeVideoInfoRequest(String access_token, String videoId) throws IOException {
+    private YouTube.Videos.List makeVideoInfoRequest(String accessToken, String videoId) throws IOException {
         YouTube.Videos.List request = youtube.videos().list(List.of(SNIPPET, STATISTICS));
-        request.setAccessToken(access_token);
+        request.setAccessToken(accessToken);
         request.setId(Collections.singletonList(videoId));
         request.setMaxResults(MAX_VIDEO_COUNT);
         return request;
     }
 
-    private YouTube.CommentThreads.List makeVideoCommentRequest(String access_token, String videoId) throws IOException {
+    private YouTube.CommentThreads.List makeVideoCommentRequest(String accessToken, String videoId) throws IOException {
         YouTube.CommentThreads.List request = youtube.commentThreads().list(Collections.singletonList(SNIPPET));
-        request.setAccessToken(access_token);
+        request.setAccessToken(accessToken);
         request.setVideoId(videoId);
         request.setOrder(RELEVANCE);
         request.setMaxResults(MAX_COMMENT_COUNT);

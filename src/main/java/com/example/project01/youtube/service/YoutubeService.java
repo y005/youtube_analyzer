@@ -48,8 +48,8 @@ public class YoutubeService {
                 .collect(Collectors.toList());
     }
 
-    public String getUserYoutubeId(String access_token) throws IOException {
-        return youtubeDataAgent.getUserId(access_token);
+    public String getUserYoutubeId(String accessToken) throws IOException {
+        return youtubeDataAgent.getUserId(accessToken);
     }
 
     @Transactional
@@ -78,8 +78,12 @@ public class YoutubeService {
     }
 
     public RefreshToken getRefreshToken(String userId) {
-        Optional<RefreshTokenEntity> entityOptional = refreshTokenRepository.findByUser_Id(userId);
-        return entityOptional.orElseThrow(RuntimeException::new);
+        RefreshTokenEntity entity = refreshTokenRepository.findByUserId(userId)
+                .orElseThrow(RuntimeException::new);
+        return RefreshToken.builder()
+                .userId(entity.getUserId())
+                .refreshToken(entity.getToken())
+                .build();
     }
 
     private OauthAccessToken getAccessToken(String id) {
