@@ -86,7 +86,7 @@ public class YoutubeService {
                 .build();
     }
 
-    private OauthAccessToken getAccessToken(String id) {
+    public OauthAccessToken getAccessToken(String id) {
         RefreshToken refreshToken = getRefreshToken(id);
         return youtubeTokenAgent.getAccessToken(refreshToken.getRefreshToken());
     }

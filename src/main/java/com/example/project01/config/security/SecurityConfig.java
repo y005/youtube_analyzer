@@ -22,7 +22,8 @@ public class SecurityConfig {
             "/youtube/oauth/**",
             "/youtube/signup/**",
             "/main/**",
-            "/asset/**"
+            "/asset/**",
+            "/error"
     };
     private static final String[] AUTH_ADMIN_LIST = {
             "/youtube/crawling/**"
@@ -30,7 +31,8 @@ public class SecurityConfig {
     private static final String[] AUTH_USER_LIST = {
             "/youtube/subscribe/**",
             "/youtube/content/**",
-            "/youtube/test/**"
+            "/youtube/test/**",
+            "/youtube/crawling/**"
     };
     @Autowired
     private ApplicationContext applicationContext;

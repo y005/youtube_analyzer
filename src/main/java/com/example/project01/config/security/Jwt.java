@@ -75,7 +75,7 @@ public class Jwt {
         }
 
         public static Claims from(String userId, List<RoleType> roles) {
-            return new Claims(userId, (String[]) roles.stream().map(Enum::name).toArray());
+            return new Claims(userId, roles.stream().map(Enum::name).toArray(String[]::new));
         }
 
         public Map<String, Object> asMap() {

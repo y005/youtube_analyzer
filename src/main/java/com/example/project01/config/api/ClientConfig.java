@@ -3,24 +3,45 @@ package com.example.project01.config.api;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.youtube.YouTube;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.retry.policy.SimpleRetryPolicy;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.time.Duration;
+
+@Slf4j
 @Configuration
 public class ClientConfig {
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        CloseableHttpClient httpClient = HttpClientBuilder.create().setMaxConnTotal(200).setMaxConnPerRoute(200).build();
-        HttpComponentsClientHttpRequestFactory customRequestFactory = new HttpComponentsClientHttpRequestFactory();
-        customRequestFactory.setHttpClient(httpClient);
-        customRequestFactory.setConnectTimeout(30000);
-        customRequestFactory.setReadTimeout(30000);
-        return builder.requestFactory(() -> customRequestFactory).build();
+        return builder.setConnectTimeout(Duration.ofSeconds(5))
+                .setReadTimeout(Duration.ofSeconds(5))
+                .additionalInterceptors(retryInterceptor())
+                .build();
+    }
+
+    @Bean
+    public ClientHttpRequestInterceptor retryInterceptor() {
+        return (request, body, execution) -> retryTemplate().execute(context -> {
+            try {
+                return execution.execute(request, body);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    @Bean
+    public RetryTemplate retryTemplate() {
+        RetryTemplate retryTemplate = new RetryTemplate();
+        retryTemplate.setRetryPolicy(new SimpleRetryPolicy(3));
+        return retryTemplate;
     }
 
     @Bean

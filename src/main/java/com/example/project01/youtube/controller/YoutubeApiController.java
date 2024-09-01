@@ -1,5 +1,6 @@
 package com.example.project01.youtube.controller;
 
+import com.example.project01.config.batch.BatchConfig;
 import com.example.project01.config.security.JwtAuthentication;
 import com.example.project01.config.security.JwtAuthenticationProvider;
 import com.example.project01.config.security.JwtAuthenticationToken;
@@ -19,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
@@ -40,6 +40,7 @@ public class YoutubeApiController {
     private final YoutubeService youtubeService;
     private final UserService userService;
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
+    private final BatchConfig batchConfig;
 
     @ExceptionHandler({Exception.class})
     @ApiIgnore
@@ -129,38 +130,14 @@ public class YoutubeApiController {
         return ResponseV1.ok(result.from(page, size, youtubeContents));
     }
 
-    //  TODO 추가 검색 api 만들기 (관련 키워드 영상 정보)
-
     @GetMapping("/crawling")
     @ApiOperation(value="구독 채널 영상 정보 크롤링", notes="가입한 모든 유저에 대해 새로 올라온 구독 채널 영상 정보를 수집한다. (관리자 계정만 사용 가능)")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "token", required = true, paramType = "header", dataTypeClass = String.class),
     })
     public ResponseV1 crawlingAllYoutubeContent() {
-        crawlingYoutubeContent();
+        batchConfig.jobScheduling();
         return ResponseV1.ok("crawling finished");
-    }
-
-    @Scheduled(cron = "0 0 8 * * *")
-    public void crawlingYoutubeContent() {
-        int page = 0;
-        List<User> users;
-        int MAX_USER = 300;
-        log.info("Youtube Content Crawling start :)");
-        do {
-            users = userService.getEveryUser(page, MAX_USER);
-            users.forEach(
-                    (user) -> {
-                        try {
-                            youtubeService.getYoutubeContent(user.getId());
-                            log.info("youtube:crawl:success {}", user.getId());
-                        } catch (Exception e) {
-                            log.warn("youtube:crawl:fail {} {}", user.getId(), e.getMessage());
-                        }
-                    }
-            );
-            ++page;
-        } while (users.size() == MAX_USER);
     }
 
     @GetMapping("/test/content")

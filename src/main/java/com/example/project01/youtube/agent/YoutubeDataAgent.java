@@ -40,7 +40,7 @@ public class YoutubeDataAgent {
 
     public List<YoutubeContent> getYoutubeContent(String accessToken) throws IOException {
         List<Subscription> subscriptionList = getSubscribeInfo(accessToken);
-        List<String> channelIdList = subscriptionList.stream().map(e->e.getSnippet().getResourceId().getChannelId()).collect(Collectors.toList());
+        List<String> channelIdList = subscriptionList.stream().map(e -> e.getSnippet().getResourceId().getChannelId()).collect(Collectors.toList());
         Map<String, BigInteger> subscriptionCountInfo = getSubscriptionCountRequest(accessToken, channelIdList);
         List<String> videoIdList = getRecentVideoId(accessToken, channelIdList);
         return getVideoInfo(accessToken, videoIdList, subscriptionCountInfo);
@@ -56,7 +56,7 @@ public class YoutubeDataAgent {
         YouTube.Channels.List request = makeSubscriptionCountRequest(accessToken, channelIdList);
         try {
             ChannelListResponse response = request.execute();
-            return response.getItems().stream().collect(Collectors.toMap(Channel::getId, (e)->e.getStatistics().getSubscriberCount()));
+            return response.getItems().stream().collect(Collectors.toMap(Channel::getId, (e) -> e.getStatistics().getSubscriberCount()));
         } catch (IOException e) {
             return Map.of();
         }
@@ -67,8 +67,8 @@ public class YoutubeDataAgent {
         channelIdList.forEach(
                 (channelId) -> {
                     try {
-                       SearchListResponse response = makeRecentYoutubeContentRequest(accessToken, channelId).execute();
-                       response.getItems().forEach(e->recentVideoIdList.add(e.getId().getVideoId()));
+                        SearchListResponse response = makeRecentYoutubeContentRequest(accessToken, channelId).execute();
+                        response.getItems().forEach(e -> recentVideoIdList.add(e.getId().getVideoId()));
                     } catch (Exception e) {
                         throw new RuntimeException("채널 영상 정보 탐색에서 에러 발생");
                     }
@@ -79,14 +79,14 @@ public class YoutubeDataAgent {
 
     private List<YoutubeContent> getVideoInfo(String accessToken, List<String> videoIdList, Map<String, BigInteger> subscriptionCountInfo) {
         return videoIdList.stream().map(
-                (videoId)->{
-                    try {
-                        return makeYoutubeContent(accessToken, videoId, subscriptionCountInfo);
-                    } catch (Exception e) {
-                        throw new RuntimeException("유튜브 정보 분석에서 에러 발생");
-                    }
-                }
-        ).filter(Objects::nonNull)
+                        (videoId) -> {
+                            try {
+                                return makeYoutubeContent(accessToken, videoId, subscriptionCountInfo);
+                            } catch (Exception e) {
+                                throw new RuntimeException("유튜브 정보 분석에서 에러 발생");
+                            }
+                        }
+                ).filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
@@ -103,7 +103,7 @@ public class YoutubeDataAgent {
         VideoStatistics statistics = response1.getItems().get(0).getStatistics();
         CommentThreadListResponse response2 = makeVideoCommentRequest(accessToken, videoId).execute();
         List<String> commentList = response2.getItems().stream().map(
-                e-> e.getSnippet().getTopLevelComment().getSnippet().getTextOriginal()
+                e -> e.getSnippet().getTopLevelComment().getSnippet().getTextOriginal()
         ).collect(Collectors.toList());
         String comments = String.join(",", commentList);
         return YoutubeContent.builder()
@@ -136,14 +136,14 @@ public class YoutubeDataAgent {
         return request;
     }
 
-    private YouTube.Search.List makeRecentYoutubeContentRequest(String accessToken,String channelId) throws IOException {
+    private YouTube.Search.List makeRecentYoutubeContentRequest(String accessToken, String channelId) throws IOException {
         YouTube.Search.List request = youtube.search().list(Collections.singletonList(ID));
         request.setAccessToken(accessToken);
         request.setChannelId(channelId);
         request.setOrder(DATE);
         request.setType(Collections.singletonList(VIDEO));
         LocalDateTime yesterday = LocalDateTime.now().minusDays(1);
-        request.setPublishedAfter(yesterday.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)+"Z");
+        request.setPublishedAfter(yesterday.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z");
         return request;
     }
 
