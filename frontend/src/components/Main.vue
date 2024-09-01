@@ -2,12 +2,15 @@
 import {onMounted, ref, toRaw} from "vue";
 import {youtubeService} from "../api/youtubeService.js";
 import Info from "./common/Info.vue";
+import {useStore} from "vuex";
 
-const loginForm = ref({userId: "", password: ""})
+const userStore = useStore()
+const loginForm = ref({userId: "", userPassword: ""})
 const youtubeId = ref("")
 const youtubeInfos = ref([{ channelName: "chxelin", title: "[𝒫𝓁𝒶𝓎𝓁𝒾𝓈𝓉 ] ✿ 들을 수 있는 플레이리스트 ✿", viewCount: 153213, likeCount: 14321, sentimentRatio: 61, relatedKeyword: ["여자 아이돌","afd","adfadf","afdafdsa"]}])
 const commentInfos = ref([{ userId: "@yj2620", content: "노래 취향저격이에요 너무 좋음 ❤", likeCount: 1}])
 const keyword = ref()
+const token = ref()
 function updateComments() {
     commentInfos.value = []
 }
@@ -23,24 +26,26 @@ function search() {
 async function oauth() {
     try {
         const response = await youtubeService.oauth()
-        console.log(response)
     } catch (error) {
 
     }
 }
 
 async function login() {
-    if (!loginForm.value.userId || !loginForm.value.password) {
+    if (!loginForm.value.userId || !loginForm.value.userPassword) {
         alert("아이디와 비밀번호를 모두 입력하세요.")
     }
     try {
         const response = await youtubeService.login(toRaw(loginForm.value))
+        token.value = response.data.token
+        await userStore.dispatch()
+        await getYoutubeContent(token.value)
     } catch (error) {
 
     }
 }
-async function getYoutubeContent() {
-    const response = await youtubeService.findYoutubeContent()
+async function getYoutubeContent(token) {
+    const response = await youtubeService.findYoutubeContent(token)
     youtubeInfos.value = response
 }
 
@@ -84,7 +89,7 @@ onMounted(() => {
                         <input
                             class="input"
                             type="password"
-                            v-model.trim="loginForm.password">
+                            v-model.trim="loginForm.userPassword">
                     </div>
                     <div class="flex justify-between mt-2">
                         <button
